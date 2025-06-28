@@ -43,6 +43,7 @@
         <section class="content-section form-section">
             <div class="form-container reveal-element">
                 <form id="contact-form" class="contact-form" novalidate data-netlify="true">
+
                     <div class="form-step">
                         <div class="form-grid">
                             <div class="form-group">
@@ -75,10 +76,14 @@
                                 <span id="slider-value" class="slider-value">5</span>
                                 <div class="slider-wrapper">
                                     <button type="button" class="slider-btn" id="slider-decrement">-</button>
-                                    <input type="range" id="level-slider" name="level" min="0" max="10" value="5" required>
+                                    <div class="custom-slider" id="custom-slider-track">
+                                        <div class="custom-slider-progress" id="custom-slider-progress"></div>
+                                        <div class="custom-slider-thumb" id="custom-slider-thumb"></div>
+                                    </div>
                                     <button type="button" class="slider-btn" id="slider-increment">+</button>
                                 </div>
                                 <span id="slider-legend" class="slider-legend">B1 - Średnio-zaawansowany</span>
+                                <input type="hidden" id="level-slider" name="level" value="5" required>
                             </div>
                         </fieldset>
                     </div>
