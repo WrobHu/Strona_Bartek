@@ -45,36 +45,37 @@
                 <form id="contact-form" class="contact-form" novalidate data-netlify="true">
 
                     <div class="form-step">
-                        <h3>Podstawowe informacje</h3>
+                        <h3>📝 Podstawowe informacje</h3>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="fname" class="required">Imię</label>
-                                <input type="text" id="fname" name="fname" required>
+                                <input type="text" id="fname" name="fname" required placeholder="Twoje imię">
                                 <span class="error-message"></span>
                             </div>
                             <div class="form-group">
                                 <label for="lname" class="required">Nazwisko</label>
-                                <input type="text" id="lname" name="lname" required>
+                                <input type="text" id="lname" name="lname" required placeholder="Twoje nazwisko">
                                 <span class="error-message"></span>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="email" class="required">Adres e-mail</label>
-                            <input type="email" id="email" name="email" required>
+                            <input type="email" id="email" name="email" required placeholder="twoj@email.com">
                             <span class="error-message"></span>
                         </div>
                         <div class="form-group">
                             <label for="phone" class="required">Numer telefonu</label>
-                            <input type="tel" id="phone" name="phone" required placeholder="np. 123 456 789">
+                            <input type="tel" id="phone" name="phone" required placeholder="123 456 789">
                             <span class="error-message"></span>
                         </div>
                     </div>
 
                     <div class="form-step">
+                        <h3>📊 Twój poziom językowy</h3>
                         <fieldset class="form-group">
                             <legend class="required">Oceń swój obecny poziom językowy:</legend>
                             <div class="slider-container">
-                                <span id="slider-value" class="slider-value">5</span>
+                                <div class="slider-value" id="slider-value">5</div>
                                 <div class="slider-wrapper">
                                     <button type="button" class="slider-btn" id="slider-decrement" aria-label="Zmniejsz poziom">-</button>
                                     <div class="custom-slider" id="custom-slider-track">
@@ -83,55 +84,57 @@
                                     </div>
                                     <button type="button" class="slider-btn" id="slider-increment" aria-label="Zwiększ poziom">+</button>
                                 </div>
-                                <span id="slider-legend" class="slider-legend">B1 - Średnio-zaawansowany</span>
+                                <div class="slider-legend" id="slider-legend">B1 - Średnio-zaawansowany</div>
                                 <input type="hidden" id="level-slider" name="level" value="5" required>
                             </div>
+                            <span class="error-message"></span>
                         </fieldset>
                     </div>
 
                     <div class="form-step">
+                        <h3>🎯 Cel nauki</h3>
                         <fieldset class="form-group">
                             <legend class="required">Jaki jest Twój główny cel nauki?</legend>
                             <div class="radio-card-group">
                                 <label class="radio-card">
                                     <input type="radio" name="goal" value="praca" required>
                                     <span class="card-content">
-                                        <strong>Do Pracy</strong><br>
+                                        <strong>💼 Do Pracy</strong><br>
                                         <small>Business English, rozmowy kwalifikacyjne</small>
                                     </span>
                                 </label>
                                 <label class="radio-card">
                                     <input type="radio" name="goal" value="wyjazd">
                                     <span class="card-content">
-                                        <strong>Na Wyjazd</strong><br>
+                                        <strong>✈️ Na Wyjazd</strong><br>
                                         <small>Turystyka, relokacja</small>
                                     </span>
                                 </label>
                                 <label class="radio-card">
                                     <input type="radio" name="goal" value="egzamin">
                                     <span class="card-content">
-                                        <strong>Do Egzaminu</strong><br>
+                                        <strong>📚 Do Egzaminu</strong><br>
                                         <small>IELTS, FCE, DELF</small>
                                     </span>
                                 </label>
                                 <label class="radio-card">
                                     <input type="radio" name="goal" value="hobby">
                                     <span class="card-content">
-                                        <strong>Dla Siebie</strong><br>
+                                        <strong>🎨 Dla Siebie</strong><br>
                                         <small>Hobby, filmy, książki</small>
                                     </span>
                                 </label>
                                 <label class="radio-card">
                                     <input type="radio" name="goal" value="rodzina">
                                     <span class="card-content">
-                                        <strong>Dla Rodziny</strong><br>
+                                        <strong>👨‍👩‍👧‍👦 Dla Rodziny</strong><br>
                                         <small>Wspólna nauka</small>
                                     </span>
                                 </label>
                                 <label class="radio-card">
                                     <input type="radio" name="goal" value="inny">
                                     <span class="card-content">
-                                        <strong>Inny Cel</strong><br>
+                                        <strong>🎯 Inny Cel</strong><br>
                                         <small>Opisz poniżej</small>
                                     </span>
                                 </label>
@@ -148,7 +151,7 @@
                     </div>
                     
                     <div class="form-step">
-                        <h3>Dodatkowe informacje</h3>
+                        <h3>💭 Dodatkowe informacje</h3>
                         <div class="form-group">
                             <label for="current-learning">Czy uczysz się aktualnie języka? (opcjonalnie)</label>
                             <textarea id="current-learning" name="current-learning" rows="4" placeholder="Jeśli tak, napisz jakiego i w jaki sposób. Czy masz ulubione materiały do nauki? Jakiej pomocy potrzebujesz najbardziej?"></textarea>
@@ -161,7 +164,7 @@
                     
                     <div id="form-main-error" class="error-message main-error"></div>
                     <button type="submit" class="btn-submit">
-                        <span class="btn-text">Wyślij wiadomość</span>
+                        <span class="btn-text">📤 Wyślij wiadomość</span>
                     </button>
                 </form>
                 
@@ -171,7 +174,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17L4 12"/>
                         </svg>
                     </div>
-                    <h2>Dziękuję!</h2>
+                    <h2>🎉 Dziękuję!</h2>
                     <p>Wiadomość została wysłana. Odpowiem najszybciej, jak to możliwe - zwykle w ciągu 24 godzin.</p>
                     <p><strong>Następne kroki:</strong> Skontaktuję się z Tobą, aby umówić bezpłatną konsultację w dogodnym terminie.</p>
                 </div>
@@ -187,7 +190,7 @@
                             <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                         </svg>
                     </div>
-                    <h3>E-mail</h3>
+                    <h3>📧 E-mail</h3>
                     <p>Napisz do mnie bezpośrednio na adres:</p>
                     <a href="mailto:bar.plociennik@gmail.com" class="btn-secondary">bar.plociennik@gmail.com</a>
                 </div>
@@ -197,7 +200,7 @@
                             <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                         </svg>
                     </div>
-                    <h3>Telefon</h3>
+                    <h3>📞 Telefon</h3>
                     <p>Zadzwoń, jeśli masz pilne pytania:</p>
                     <a href="tel:+48661576007" class="btn-secondary">+48 661 576 007</a>
                 </div>
@@ -207,7 +210,7 @@
                             <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zM12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                         </svg>
                     </div>
-                    <h3>Czas odpowiedzi</h3>
+                    <h3>⏰ Czas odpowiedzi</h3>
                     <p>Odpowiadam na wiadomości zwykle w ciągu 24 godzin, w dni robocze jeszcze szybciej.</p>
                     <p><strong>Godziny dostępności:</strong><br>Pon-Pt: 9:00-20:00<br>Sob: 10:00-16:00</p>
                 </div>
