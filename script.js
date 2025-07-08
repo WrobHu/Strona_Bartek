@@ -1,4 +1,4 @@
-// === MAIN APPLICATION CONTROLLER v2.0 ===
+// === MAIN APPLICATION CONTROLLER v3.0 - FIXED ===
 
 class AppController {
     constructor() {
@@ -25,14 +25,20 @@ class AppController {
     init() {
         if (this.isInitialized) return;
         
-        document.addEventListener('DOMContentLoaded', () => {
-            this.checkDependencies();
-            this.initializeCore();
-            this.initializeModules();
-            this.setupGlobalEvents();
-            this.isInitialized = true;
-            console.log('🚀 Application initialized successfully');
-        });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initialize());
+        } else {
+            this.initialize();
+        }
+    }
+
+    initialize() {
+        this.checkDependencies();
+        this.initializeCore();
+        this.initializeModules();
+        this.setupGlobalEvents();
+        this.isInitialized = true;
+        console.log('🚀 Application initialized successfully');
     }
 
     checkDependencies() {
@@ -46,7 +52,7 @@ class AppController {
         });
 
         if (missingLibraries.length > 0) {
-            console.error(`❌ Missing required libraries: ${missingLibraries.join(', ')}`);
+            console.warn(`⚠️ Missing libraries: ${missingLibraries.join(', ')} - Some features may not work`);
             return false;
         }
 
@@ -66,7 +72,7 @@ class AppController {
         // Initialize page animations
         this.initializePageLoadAnimations();
         
-        // Initialize mobile menu
+        // Initialize mobile menu - PRIORITY
         this.initializeMobileMenu();
     }
 
@@ -105,6 +111,9 @@ class AppController {
         
         // Keyboard navigation
         this.setupKeyboardNavigation();
+
+        // Reveal elements on scroll (without GSAP if not available)
+        this.setupScrollReveal();
     }
 
     handleScroll() {
@@ -151,6 +160,33 @@ class AppController {
         });
     }
 
+    setupScrollReveal() {
+        const revealElements = document.querySelectorAll('.reveal-element, .animated-headline');
+        
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            revealElements.forEach(element => {
+                observer.observe(element);
+            });
+        } else {
+            // Fallback for older browsers
+            revealElements.forEach(element => {
+                element.classList.add('animate');
+            });
+        }
+    }
+
     closeAllModals() {
         // Close mobile menu
         const hamburger = document.getElementById('hamburger-btn');
@@ -188,15 +224,19 @@ class AppController {
 
     // === PAGE LOAD ANIMATIONS ===
     initializePageLoadAnimations() {
+        if (typeof gsap === 'undefined') {
+            console.warn('GSAP not available, using CSS animations');
+            return;
+        }
+
         // Enhanced headline animations
         gsap.utils.toArray('.animated-headline').forEach((headline, index) => {
             gsap.from(headline, {
                 autoAlpha: 0,
-                filter: 'blur(10px)',
                 y: 30,
-                duration: 1.5,
-                ease: 'expo.out',
-                delay: 0.5 + (index * 0.1)
+                duration: 1.2,
+                ease: 'power2.out',
+                delay: 0.3 + (index * 0.1)
             });
         });
         
@@ -204,9 +244,9 @@ class AppController {
         gsap.utils.toArray('.reveal-element').forEach(element => {
             gsap.from(element, {
                 autoAlpha: 0,
-                y: 50,
-                duration: 1.5,
-                ease: 'expo.out',
+                y: 30,
+                duration: 0.8,
+                ease: 'power2.out',
                 scrollTrigger: {
                     trigger: element,
                     start: 'top 90%',
@@ -229,61 +269,71 @@ class AppController {
                 }
             });
         });
-
-        // Fade in animations for form elements
-        gsap.utils.toArray('.fade-in').forEach((element, index) => {
-            gsap.from(element, {
-                autoAlpha: 0,
-                y: 30,
-                duration: 0.8,
-                ease: 'power2.out',
-                delay: index * 0.1
-            });
-        });
     }
 
-    // === MOBILE MENU MODULE ===
+    // === MOBILE MENU MODULE - FIXED ===
     initializeMobileMenu() {
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const mainNav = document.getElementById('main-nav');
         const header = document.querySelector('.main-header');
 
-        if (!hamburgerBtn || !mainNav) return;
-
-        // Create hamburger lines if they don't exist
-        if (!hamburgerBtn.querySelector('.hamburger-line')) {
-            for (let i = 0; i < 3; i++) {
-                const line = document.createElement('span');
-                line.className = 'hamburger-line';
-                hamburgerBtn.appendChild(line);
-            }
+        if (!hamburgerBtn || !mainNav) {
+            console.warn('Mobile menu elements not found');
+            return;
         }
 
-        hamburgerBtn.addEventListener('click', () => {
+        // Ensure hamburger lines exist
+        if (!hamburgerBtn.querySelector('.hamburger-line')) {
+            hamburgerBtn.innerHTML = `
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            `;
+        }
+
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
             const isActive = hamburgerBtn.classList.toggle('active');
             mainNav.classList.toggle('mobile-active', isActive);
-            header.classList.toggle('nav-open', isActive);
+            
+            if (header) {
+                header.classList.toggle('nav-open', isActive);
+            }
+            
             document.body.classList.toggle('nav-open', isActive);
 
-            // Animate hamburger lines
-            const lines = hamburgerBtn.querySelectorAll('.hamburger-line');
-            if (isActive) {
-                gsap.to(lines[0], { rotation: 45, y: 6, duration: 0.3 });
-                gsap.to(lines[1], { autoAlpha: 0, duration: 0.3 });
-                gsap.to(lines[2], { rotation: -45, y: -6, duration: 0.3 });
-            } else {
-                gsap.to(lines[0], { rotation: 0, y: 0, duration: 0.3 });
-                gsap.to(lines[1], { autoAlpha: 1, duration: 0.3 });
-                gsap.to(lines[2], { rotation: 0, y: 0, duration: 0.3 });
-            }
+            console.log('Menu toggled:', isActive ? 'open' : 'closed');
         });
 
         // Close menu when clicking nav links
         mainNav.addEventListener('click', (e) => {
             if (e.target.tagName === 'A') {
-                hamburgerBtn.click();
+                hamburgerBtn.classList.remove('active');
+                mainNav.classList.remove('mobile-active');
+                if (header) {
+                    header.classList.remove('nav-open');
+                }
+                document.body.classList.remove('nav-open');
             }
         });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (hamburgerBtn.classList.contains('active') && 
+                !mainNav.contains(e.target) && 
+                !hamburgerBtn.contains(e.target)) {
+                hamburgerBtn.classList.remove('active');
+                mainNav.classList.remove('mobile-active');
+                if (header) {
+                    header.classList.remove('nav-open');
+                }
+                document.body.classList.remove('nav-open');
+            }
+        });
+
+        console.log('✅ Mobile menu initialized');
     }
 
     // === FLOATING WORDS MODULE ===
@@ -297,7 +347,7 @@ class AppController {
             'Oui', 'Yes', 'Non', 'No', 'Savoir', 'To know', 'Español', 'Hola', 'DE', 'Guten Tag'
         ];
         
-        const wordCount = Math.min(40, Math.floor(window.innerWidth / 30));
+        const wordCount = Math.min(30, Math.floor(window.innerWidth / 40));
         
         for (let i = 0; i < wordCount; i++) {
             const word = document.createElement('span');
@@ -305,33 +355,43 @@ class AppController {
             word.textContent = words[i % words.length];
             container.appendChild(word);
 
-            gsap.set(word, {
-                x: Math.random() * (window.innerWidth - 100),
-                y: Math.random() * (window.innerHeight - 50),
-                scale: 0.5 + Math.random() * 0.5,
-                autoAlpha: 0
-            });
-
-            const animateWord = (element) => {
-                gsap.to(element, {
-                    x: Math.random() * window.innerWidth,
-                    y: Math.random() * window.innerHeight,
-                    duration: 30 + Math.random() * 20,
-                    autoAlpha: 0.01 + Math.random() * 0.03,
-                    scale: 0.7 + Math.random() * 0.5,
-                    ease: 'none',
-                    onComplete: () => animateWord(element)
-                });
-            };
-
-            gsap.to(word, { 
-                autoAlpha: 0.01 + Math.random() * 0.03, 
-                delay: Math.random() * 10, 
-                duration: 3 
-            });
+            // Position randomly
+            word.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            word.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+            word.style.opacity = Math.random() * 0.1 + 0.05;
             
-            animateWord(word);
+            // Animate if GSAP is available
+            if (typeof gsap !== 'undefined') {
+                gsap.set(word, {
+                    x: Math.random() * (window.innerWidth - 100),
+                    y: Math.random() * (window.innerHeight - 50),
+                    scale: 0.5 + Math.random() * 0.5,
+                    autoAlpha: 0
+                });
+
+                const animateWord = (element) => {
+                    gsap.to(element, {
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight,
+                        duration: 30 + Math.random() * 20,
+                        autoAlpha: 0.01 + Math.random() * 0.05,
+                        scale: 0.7 + Math.random() * 0.5,
+                        ease: 'none',
+                        onComplete: () => animateWord(element)
+                    });
+                };
+
+                gsap.to(word, { 
+                    autoAlpha: 0.01 + Math.random() * 0.05, 
+                    delay: Math.random() * 10, 
+                    duration: 3 
+                });
+                
+                animateWord(word);
+            }
         }
+        
+        console.log('✅ Floating words initialized');
     }
 
     // === CALL TO ACTION MODULE ===
@@ -342,44 +402,52 @@ class AppController {
 
         if (!openBtn || !closeBtn || !modal) return;
 
-        gsap.set(modal, { autoAlpha: 0, scale: 0.8 });
-        
-        const timeline = gsap.timeline({ paused: true });
-        
-        timeline
-            .to(openBtn, { 
-                scale: 0, 
-                autoAlpha: 0, 
-                duration: 0.3, 
-                ease: 'back.in(1.7)' 
-            })
-            .to(modal, {
-                autoAlpha: 1,
-                scale: 1,
-                duration: 0.6,
-                ease: 'back.out(1.7)'
-            }, "-=0.1")
-            .from(modal.querySelectorAll('h3, p, a'), { 
-                y: 20, 
-                autoAlpha: 0, 
-                stagger: 0.1, 
-                duration: 0.5 
-            }, "-=0.4");
+        let isOpen = false;
 
-        openBtn.addEventListener('click', () => {
-            timeline.play();
-        });
+        const openModal = () => {
+            if (isOpen) return;
+            isOpen = true;
+            
+            if (typeof gsap !== 'undefined') {
+                gsap.set(modal, { display: 'block' });
+                gsap.to(openBtn, { scale: 0, autoAlpha: 0, duration: 0.3 });
+                gsap.to(modal, { autoAlpha: 1, scale: 1, duration: 0.4, ease: 'back.out(1.7)' });
+            } else {
+                openBtn.style.display = 'none';
+                modal.style.display = 'block';
+                modal.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+            }
+        };
 
-        closeBtn.addEventListener('click', () => {
-            timeline.reverse();
-        });
+        const closeModal = () => {
+            if (!isOpen) return;
+            isOpen = false;
+            
+            if (typeof gsap !== 'undefined') {
+                gsap.to(modal, { autoAlpha: 0, scale: 0.8, duration: 0.3 });
+                gsap.to(openBtn, { scale: 1, autoAlpha: 1, duration: 0.3, delay: 0.1 });
+            } else {
+                modal.style.opacity = '0';
+                modal.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    openBtn.style.display = 'flex';
+                }, 300);
+            }
+        };
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
 
         // Close on outside click
         popup.addEventListener('click', (e) => {
             if (e.target === popup) {
-                timeline.reverse();
+                closeModal();
             }
         });
+
+        console.log('✅ CTA popup initialized');
     }
 
     // === FAQ ACCORDION MODULE ===
@@ -392,12 +460,10 @@ class AppController {
             
             if (!question || !answer) return;
 
-            gsap.set(answer, { 
-                height: 0, 
-                autoAlpha: 0, 
-                paddingTop: 0, 
-                paddingBottom: 0 
-            });
+            // Set initial state
+            answer.style.maxHeight = '0';
+            answer.style.overflow = 'hidden';
+            answer.style.transition = 'max-height 0.3s ease, padding 0.3s ease';
 
             question.addEventListener('click', () => {
                 const isActive = item.classList.contains('active');
@@ -407,14 +473,9 @@ class AppController {
                     if (otherItem !== item && otherItem.classList.contains('active')) {
                         otherItem.classList.remove('active');
                         const otherAnswer = otherItem.querySelector('.faq-answer');
-                        gsap.to(otherAnswer, {
-                            height: 0,
-                            autoAlpha: 0,
-                            paddingTop: 0,
-                            paddingBottom: 0,
-                            duration: 0.4,
-                            ease: 'power2.inOut'
-                        });
+                        otherAnswer.style.maxHeight = '0';
+                        otherAnswer.style.paddingTop = '0';
+                        otherAnswer.style.paddingBottom = '0';
                     }
                 });
 
@@ -423,27 +484,19 @@ class AppController {
                 
                 if (!isActive) {
                     // Open
-                    gsap.to(answer, {
-                        height: 'auto',
-                        autoAlpha: 1,
-                        paddingTop: '0.5rem',
-                        paddingBottom: '1.5rem',
-                        duration: 0.5,
-                        ease: 'power2.out'
-                    });
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    answer.style.paddingTop = '0.5rem';
+                    answer.style.paddingBottom = '1.5rem';
                 } else {
                     // Close
-                    gsap.to(answer, {
-                        height: 0,
-                        autoAlpha: 0,
-                        paddingTop: 0,
-                        paddingBottom: 0,
-                        duration: 0.4,
-                        ease: 'power2.inOut'
-                    });
+                    answer.style.maxHeight = '0';
+                    answer.style.paddingTop = '0';
+                    answer.style.paddingBottom = '0';
                 }
             });
         });
+
+        console.log('✅ FAQ accordion initialized');
     }
 
     // === FORM INTERACTION MODULE ===
@@ -463,6 +516,11 @@ class FormHandler {
             email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
             phone: /^\d{9}$/
         };
+        this.sliderLevels = [
+            "0 - Brak znajomości", "A1 - Początkujący", "A1/A2", "A2 - Podstawowy", "A2/B1", 
+            "B1 - Średnio-zaawansowany", "B1/B2", "B2 - Wyższy średnio-zaawansowany",
+            "B2/C1", "C1 - Zaawansowany", "C2 - Poziom biegły"
+        ];
     }
 
     init() {
@@ -471,6 +529,7 @@ class FormHandler {
         this.setupGoalSelection();
         this.setupValidation();
         this.setupSubmission();
+        console.log('✅ Form handler initialized');
     }
 
     setupElements() {
@@ -479,10 +538,11 @@ class FormHandler {
             submitButton: this.form.querySelector('.btn-submit'),
             successState: document.getElementById('form-success-state'),
             mainError: document.getElementById('form-main-error'),
-            slider: document.getElementById('level-slider'),
             sliderContainer: this.form.querySelector('.slider-container'),
             sliderValueDisplay: document.getElementById('slider-value'),
             sliderLegendDisplay: document.getElementById('slider-legend'),
+            sliderProgress: document.getElementById('custom-slider-progress'),
+            sliderThumb: document.getElementById('custom-slider-thumb'),
             decrementBtn: document.getElementById('slider-decrement'),
             incrementBtn: document.getElementById('slider-increment'),
             goalRadios: this.form.querySelectorAll('input[name="goal"]'),
@@ -490,69 +550,148 @@ class FormHandler {
             otherGoalInput: document.getElementById('other-goal-text'),
             phoneInput: document.getElementById('phone')
         };
+
+        // Create hidden slider input if it doesn't exist
+        if (!document.getElementById('level-slider')) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.id = 'level-slider';
+            hiddenInput.name = 'level';
+            hiddenInput.value = '5';
+            hiddenInput.required = true;
+            this.form.appendChild(hiddenInput);
+        }
+        this.elements.slider = document.getElementById('level-slider');
     }
 
     setupSlider() {
-        const { slider, sliderValueDisplay, sliderLegendDisplay, sliderContainer, decrementBtn, incrementBtn } = this.elements;
+        const { 
+            sliderContainer, 
+            sliderValueDisplay, 
+            sliderLegendDisplay, 
+            sliderProgress, 
+            sliderThumb,
+            decrementBtn, 
+            incrementBtn, 
+            slider 
+        } = this.elements;
         
-        if (!slider) return;
+        if (!sliderContainer) return;
 
-        const sliderLevels = [
-            "0 - Brak znajomości", "A1 - Początkujący", "A1/A2", "A2 - Podstawowy", "A2/B1", 
-            "B1 - Średnio-zaawansowany", "B1/B2", "B2 - Wyższy średnio-zaawansowany",
-            "B2/C1", "C1 - Zaawansowany", "C2 - Poziom biegły"
-        ];
-        
+        let currentValue = 5; // Default value
+
         const updateSliderDisplay = () => {
-            const value = parseInt(slider.value);
-            const max = parseInt(slider.max);
-            const min = parseInt(slider.min);
-            const percent = ((value - min) / (max - min)) * 100;
+            const percent = (currentValue / 10) * 100;
             
-            if (sliderValueDisplay) sliderValueDisplay.textContent = value;
-            if (sliderLegendDisplay) sliderLegendDisplay.textContent = sliderLevels[value];
+            if (sliderValueDisplay) sliderValueDisplay.textContent = currentValue;
+            if (sliderLegendDisplay) sliderLegendDisplay.textContent = this.sliderLevels[currentValue];
+            if (slider) slider.value = currentValue;
             
-            slider.style.setProperty('--slider-progress', `${percent}%`);
+            // Update progress bar
+            if (sliderProgress) {
+                sliderProgress.style.width = `${percent}%`;
+            }
+            
+            // Update thumb position
+            if (sliderThumb) {
+                sliderThumb.style.left = `${percent}%`;
+            }
 
+            // Update color based on level
             let colorVar;
-            if (value <= 3) colorVar = 'var(--color-error)';
-            else if (value <= 7) colorVar = 'var(--color-warn)';
+            if (currentValue <= 3) colorVar = 'var(--color-error)';
+            else if (currentValue <= 7) colorVar = 'var(--color-warn)';
             else colorVar = 'var(--color-success)';
             
             if (sliderContainer) {
-                gsap.to(sliderContainer, { 
-                    '--current-slider-color': colorVar, 
-                    duration: 0.4 
-                });
+                sliderContainer.style.setProperty('--current-slider-color', colorVar);
+                if (sliderProgress) sliderProgress.style.backgroundColor = colorVar;
+                if (sliderThumb) sliderThumb.style.borderColor = colorVar;
+                if (sliderValueDisplay) sliderValueDisplay.style.color = colorVar;
             }
             
-            this.validateField(slider, false);
+            this.validateField(slider || sliderContainer, false);
         };
 
-        slider.addEventListener('input', updateSliderDisplay);
-        
+        // Decrement button
         if (decrementBtn) {
-            decrementBtn.addEventListener('click', () => {
-                const currentValue = parseInt(slider.value);
-                const minValue = parseInt(slider.min);
-                if (currentValue > minValue) {
-                    slider.value = currentValue - 1;
+            decrementBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentValue > 0) {
+                    currentValue--;
                     updateSliderDisplay();
                 }
             });
         }
 
+        // Increment button
         if (incrementBtn) {
-            incrementBtn.addEventListener('click', () => {
-                const currentValue = parseInt(slider.value);
-                const maxValue = parseInt(slider.max);
-                if (currentValue < maxValue) {
-                    slider.value = currentValue + 1;
+            incrementBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentValue < 10) {
+                    currentValue++;
                     updateSliderDisplay();
                 }
             });
         }
 
+        // Click on slider track
+        const sliderTrack = document.getElementById('custom-slider-track');
+        if (sliderTrack) {
+            sliderTrack.addEventListener('click', (e) => {
+                const rect = sliderTrack.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const percent = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
+                currentValue = Math.round((percent / 100) * 10);
+                updateSliderDisplay();
+            });
+        }
+
+        // Touch/drag support for thumb
+        if (sliderThumb && sliderTrack) {
+            let isDragging = false;
+            
+            const handleMove = (clientX) => {
+                if (!isDragging) return;
+                
+                const rect = sliderTrack.getBoundingClientRect();
+                const moveX = clientX - rect.left;
+                const percent = Math.max(0, Math.min(100, (moveX / rect.width) * 100));
+                currentValue = Math.round((percent / 100) * 10);
+                updateSliderDisplay();
+            };
+
+            sliderThumb.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                handleMove(e.clientX);
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            // Touch events
+            sliderThumb.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                e.preventDefault();
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    handleMove(e.touches[0].clientX);
+                }
+            });
+
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+
+        // Initial update
         updateSliderDisplay();
     }
 
@@ -568,13 +707,6 @@ class FormHandler {
                 if (radio.checked) {
                     const selectedCard = radio.closest('.radio-card');
                     selectedCard.classList.add('selected');
-                    
-                    // Animate selection
-                    gsap.from(selectedCard, {
-                        scale: 0.98,
-                        duration: 0.2,
-                        ease: 'power2.out'
-                    });
                 }
                 
                 // Handle "other" option
@@ -642,15 +774,20 @@ class FormHandler {
             }
         });
 
-        if (!isFormValid) {
+        // Special validation for goals
+        const checkedGoal = this.form.querySelector('input[name="goal"]:checked');
+        if (!checkedGoal) {
+            isFormValid = false;
             if (mainError) {
+                mainError.textContent = "Proszę wybrać cel nauki.";
+                mainError.classList.add('visible');
+            }
+        }
+
+        if (!isFormValid) {
+            if (mainError && !mainError.classList.contains('visible')) {
                 mainError.textContent = "Proszę uzupełnić wszystkie wymagane pola oznaczone gwiazdką.";
                 mainError.classList.add('visible');
-                gsap.from(mainError, { 
-                    y: -10, 
-                    autoAlpha: 0, 
-                    duration: 0.3 
-                });
             }
             return;
         }
@@ -665,17 +802,9 @@ class FormHandler {
         // Update submit button
         if (submitButton) {
             submitButton.disabled = true;
-            const buttonText = submitButton.querySelector('.btn-text');
+            const buttonText = submitButton.querySelector('.btn-text') || submitButton;
             const originalText = buttonText.textContent;
             buttonText.textContent = 'Wysyłanie...';
-            
-            // Add loading animation
-            gsap.to(submitButton, {
-                scale: 0.98,
-                duration: 0.1,
-                yoyo: true,
-                repeat: 1
-            });
         }
 
         try {
@@ -698,42 +827,15 @@ class FormHandler {
         
         if (!successState) return;
 
-        const timeline = gsap.timeline();
-        
         // Hide form
-        await timeline.to(this.form, { 
-            autoAlpha: 0, 
-            y: -50, 
-            duration: 0.5, 
-            ease: 'power3.in' 
-        });
-
-        // Show success state
-        successState.style.visibility = 'visible';
-        timeline.set(successState, { autoAlpha: 1 });
+        this.form.style.opacity = '0';
+        this.form.style.transform = 'translateY(-20px)';
         
-        // Animate success elements
-        const successIcon = successState.querySelector('.success-icon');
-        const successTexts = successState.querySelectorAll('h2, p');
-        
-        if (successIcon) {
-            timeline.from(successIcon, { 
-                scale: 0, 
-                rotation: 180,
-                ease: 'back.out(1.7)', 
-                duration: 0.6 
-            });
-        }
-        
-        if (successTexts.length > 0) {
-            timeline.from(successTexts, { 
-                y: 30, 
-                autoAlpha: 0, 
-                stagger: 0.15, 
-                duration: 0.5,
-                ease: 'power2.out'
-            }, "-=0.3");
-        }
+        setTimeout(() => {
+            this.form.style.display = 'none';
+            successState.style.visibility = 'visible';
+            successState.style.opacity = '1';
+        }, 500);
     }
 
     showError(message) {
@@ -742,32 +844,29 @@ class FormHandler {
         if (mainError) {
             mainError.textContent = message;
             mainError.classList.add('visible');
-            gsap.from(mainError, { 
-                y: -10, 
-                autoAlpha: 0, 
-                duration: 0.3 
-            });
         }
     }
 
     validateField(field, showError = false) {
-        const formGroup = field.closest('.form-group');
+        if (!field) return true;
+        
+        const formGroup = field.closest('.form-group') || field.closest('fieldset');
         const errorSpan = formGroup?.querySelector('.error-message');
         let isValid = true;
         let message = '';
         
         const value = field.value ? field.value.trim() : '';
-        const fieldToStyle = field.type === 'range' ? this.elements.sliderContainer : field;
+        const fieldToStyle = field.type === 'hidden' || field.name === 'level' ? this.elements.sliderContainer : field;
 
         // Validation logic
-        if (field.required) {
+        if (field.required || field.name === 'level') {
             if (field.name === 'goal') {
                 const checkedGoal = this.form.querySelector('input[name="goal"]:checked');
                 if (!checkedGoal) {
                     isValid = false;
                     if (showError) message = 'Proszę wybrać cel nauki.';
                 }
-            } else if (field.type === 'range') {
+            } else if (field.type === 'hidden' && field.name === 'level') {
                 isValid = true; // Slider always has value
             } else if (value === '') {
                 isValid = false;
@@ -791,9 +890,10 @@ class FormHandler {
         if (fieldToStyle) {
             fieldToStyle.classList.remove('valid', 'error');
             
-            if (isValid && field.required) {
+            if (isValid && (field.required || field.name === 'level')) {
                 if ((field.type !== 'radio' && value !== '') || 
-                    field.type === 'range' || 
+                    field.type === 'hidden' || 
+                    field.name === 'level' ||
                     (field.type === 'radio' && this.form.querySelector('input[name="goal"]:checked'))) {
                     fieldToStyle.classList.add('valid');
                 }
@@ -803,18 +903,11 @@ class FormHandler {
         }
 
         // Handle error message
-        if (errorSpan) {
-            if (message && showError) {
-                errorSpan.textContent = message;
-                errorSpan.classList.add('visible');
-                gsap.from(errorSpan, { 
-                    y: -5, 
-                    autoAlpha: 0, 
-                    duration: 0.3 
-                });
-            } else {
-                errorSpan.classList.remove('visible');
-            }
+        if (errorSpan && message && showError) {
+            errorSpan.textContent = message;
+            errorSpan.classList.add('visible');
+        } else if (errorSpan && (!message || !showError)) {
+            errorSpan.classList.remove('visible');
         }
         
         return isValid;
@@ -867,3 +960,7 @@ class Utils {
 
 // === INITIALIZE APPLICATION ===
 const app = new AppController();
+
+// Export for debugging
+window.AppController = AppController;
+window.app = app;
