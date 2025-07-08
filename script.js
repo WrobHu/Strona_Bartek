@@ -1,4 +1,4 @@
-// === MAIN APPLICATION CONTROLLER v3.0 - FIXED ===
+// === MAIN APPLICATION CONTROLLER v3.1 - VISIBLE CONTENT ===
 
 class AppController {
     constructor() {
@@ -33,12 +33,13 @@ class AppController {
     }
 
     initialize() {
+        console.log('🚀 Initializing application...');
         this.checkDependencies();
         this.initializeCore();
         this.initializeModules();
         this.setupGlobalEvents();
         this.isInitialized = true;
-        console.log('🚀 Application initialized successfully');
+        console.log('✅ Application initialized successfully');
     }
 
     checkDependencies() {
@@ -69,11 +70,44 @@ class AppController {
             this.initializeSmoothScroll();
         }
 
-        // Initialize page animations
+        // Initialize page animations - BUT DON'T HIDE CONTENT
         this.initializePageLoadAnimations();
         
         // Initialize mobile menu - PRIORITY
         this.initializeMobileMenu();
+        
+        // Make sure all content is visible
+        this.ensureContentVisibility();
+    }
+
+    ensureContentVisibility() {
+        // Force all content to be visible
+        const allElements = document.querySelectorAll('*');
+        allElements.forEach(element => {
+            // Remove any potential hiding from animations
+            if (element.style.opacity === '0' || element.style.visibility === 'hidden') {
+                element.style.opacity = '1';
+                element.style.visibility = 'visible';
+            }
+        });
+        
+        // Specifically ensure main content areas are visible
+        const contentSelectors = [
+            'main', '.hero-section', '.page-title-section', '.content-section',
+            '.form-section', '.pricing-grid', '.features-grid', '.testimonials-grid',
+            '.offer-grid', '.about-me-layout', '.cta-section', '.discounts-section'
+        ];
+        
+        contentSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                element.style.opacity = '1';
+                element.style.visibility = 'visible';
+                element.style.display = element.style.display || '';
+            });
+        });
+        
+        console.log('✅ Content visibility ensured');
     }
 
     initializeModules() {
@@ -112,7 +146,7 @@ class AppController {
         // Keyboard navigation
         this.setupKeyboardNavigation();
 
-        // Reveal elements on scroll (without GSAP if not available)
+        // Simple scroll reveal without hiding content initially
         this.setupScrollReveal();
     }
 
@@ -161,6 +195,7 @@ class AppController {
     }
 
     setupScrollReveal() {
+        // Simple fade-in effect without hiding content initially
         const revealElements = document.querySelectorAll('.reveal-element, .animated-headline');
         
         if ('IntersectionObserver' in window) {
@@ -168,6 +203,8 @@ class AppController {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('animate');
+                        // Add a gentle fade-in class without hiding the content
+                        entry.target.style.animation = 'fadeIn 0.6s ease-out';
                         observer.unobserve(entry.target);
                     }
                 });
@@ -177,11 +214,16 @@ class AppController {
             });
 
             revealElements.forEach(element => {
+                // Don't hide the elements, just observe them
+                element.style.opacity = '1';
+                element.style.visibility = 'visible';
                 observer.observe(element);
             });
         } else {
-            // Fallback for older browsers
+            // Fallback for older browsers - just make everything visible
             revealElements.forEach(element => {
+                element.style.opacity = '1';
+                element.style.visibility = 'visible';
                 element.classList.add('animate');
             });
         }
@@ -229,46 +271,56 @@ class AppController {
             return;
         }
 
-        // Enhanced headline animations
+        // GENTLE animations that don't hide content
         gsap.utils.toArray('.animated-headline').forEach((headline, index) => {
+            // Don't hide content, just add gentle animation
+            headline.style.opacity = '1';
+            headline.style.visibility = 'visible';
+            
             gsap.from(headline, {
-                autoAlpha: 0,
-                y: 30,
-                duration: 1.2,
+                y: 20,
+                duration: 0.8,
                 ease: 'power2.out',
-                delay: 0.3 + (index * 0.1)
+                delay: 0.2 + (index * 0.1)
             });
         });
         
-        // Reveal elements on scroll
-        gsap.utils.toArray('.reveal-element').forEach(element => {
-            gsap.from(element, {
-                autoAlpha: 0,
-                y: 30,
-                duration: 0.8,
-                ease: 'power2.out',
-                scrollTrigger: {
-                    trigger: element,
-                    start: 'top 90%',
-                    toggleActions: 'play none none none',
-                }
+        // Gentle reveal elements on scroll
+        if (typeof ScrollTrigger !== 'undefined') {
+            gsap.utils.toArray('.reveal-element').forEach(element => {
+                // Ensure element is visible first
+                element.style.opacity = '1';
+                element.style.visibility = 'visible';
+                
+                gsap.from(element, {
+                    y: 20,
+                    duration: 0.6,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 90%',
+                        toggleActions: 'play none none none',
+                    }
+                });
             });
-        });
+        }
 
         // Parallax effects
-        const parallaxElements = document.querySelectorAll('.image-parallax');
-        parallaxElements.forEach(element => {
-            gsap.to(element, {
-                yPercent: -15,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: element.closest('.about-me-image-wrapper') || element,
-                    start: 'top bottom',
-                    end: 'bottom top',
-                    scrub: true
-                }
+        if (typeof ScrollTrigger !== 'undefined') {
+            const parallaxElements = document.querySelectorAll('.image-parallax');
+            parallaxElements.forEach(element => {
+                gsap.to(element, {
+                    yPercent: -15,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: element.closest('.about-me-image-wrapper') || element,
+                        start: 'top bottom',
+                        end: 'bottom top',
+                        scrub: true
+                    }
+                });
             });
-        });
+        }
     }
 
     // === MOBILE MENU MODULE - FIXED ===
@@ -366,7 +418,7 @@ class AppController {
                     x: Math.random() * (window.innerWidth - 100),
                     y: Math.random() * (window.innerHeight - 50),
                     scale: 0.5 + Math.random() * 0.5,
-                    autoAlpha: 0
+                    autoAlpha: 0.05 + Math.random() * 0.1
                 });
 
                 const animateWord = (element) => {
@@ -382,9 +434,9 @@ class AppController {
                 };
 
                 gsap.to(word, { 
-                    autoAlpha: 0.01 + Math.random() * 0.05, 
-                    delay: Math.random() * 10, 
-                    duration: 3 
+                    autoAlpha: 0.05 + Math.random() * 0.1, 
+                    delay: Math.random() * 5, 
+                    duration: 2 
                 });
                 
                 animateWord(word);
@@ -403,6 +455,13 @@ class AppController {
         if (!openBtn || !closeBtn || !modal) return;
 
         let isOpen = false;
+
+        // Make sure popup button is visible
+        openBtn.style.opacity = '1';
+        openBtn.style.visibility = 'visible';
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.8)';
+        modal.style.display = 'none';
 
         const openModal = () => {
             if (isOpen) return;
@@ -524,6 +583,10 @@ class FormHandler {
     }
 
     init() {
+        // Make sure form is visible
+        this.form.style.opacity = '1';
+        this.form.style.visibility = 'visible';
+        
         this.setupElements();
         this.setupSlider();
         this.setupGoalSelection();
@@ -562,6 +625,14 @@ class FormHandler {
             this.form.appendChild(hiddenInput);
         }
         this.elements.slider = document.getElementById('level-slider');
+
+        // Ensure all elements are visible
+        Object.values(this.elements).forEach(element => {
+            if (element && element.style) {
+                element.style.opacity = '1';
+                element.style.visibility = 'visible';
+            }
+        });
     }
 
     setupSlider() {
@@ -578,13 +649,25 @@ class FormHandler {
         
         if (!sliderContainer) return;
 
+        // Make sure slider container is visible
+        sliderContainer.style.opacity = '1';
+        sliderContainer.style.visibility = 'visible';
+
         let currentValue = 5; // Default value
 
         const updateSliderDisplay = () => {
             const percent = (currentValue / 10) * 100;
             
-            if (sliderValueDisplay) sliderValueDisplay.textContent = currentValue;
-            if (sliderLegendDisplay) sliderLegendDisplay.textContent = this.sliderLevels[currentValue];
+            if (sliderValueDisplay) {
+                sliderValueDisplay.textContent = currentValue;
+                sliderValueDisplay.style.opacity = '1';
+                sliderValueDisplay.style.visibility = 'visible';
+            }
+            if (sliderLegendDisplay) {
+                sliderLegendDisplay.textContent = this.sliderLevels[currentValue];
+                sliderLegendDisplay.style.opacity = '1';
+                sliderLegendDisplay.style.visibility = 'visible';
+            }
             if (slider) slider.value = currentValue;
             
             // Update progress bar
@@ -699,6 +782,13 @@ class FormHandler {
         const { goalRadios, otherGoalWrapper, otherGoalInput } = this.elements;
         
         goalRadios.forEach(radio => {
+            // Make sure radio cards are visible
+            const radioCard = radio.closest('.radio-card');
+            if (radioCard) {
+                radioCard.style.opacity = '1';
+                radioCard.style.visibility = 'visible';
+            }
+
             radio.addEventListener('change', () => {
                 // Remove selected class from all cards
                 goalRadios.forEach(r => r.closest('.radio-card').classList.remove('selected'));
