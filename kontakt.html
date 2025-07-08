@@ -42,111 +42,60 @@
 
         <section class="content-section form-section">
             <div class="form-container reveal-element">
-                <form id="contact-form" class="contact-form" novalidate>
-
-                    <div class="form-step">
-                        <h3>📝 Podstawowe informacje</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="fname" class="required">Imię</label>
-                                <input type="text" id="fname" name="fname" required placeholder="Twoje imię">
-                                <span class="error-message"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="lname" class="required">Nazwisko</label>
-                                <input type="text" id="lname" name="lname" required placeholder="Twoje nazwisko">
-                                <span class="error-message"></span>
-                            </div>
-                        </div>
+                <form id="contact-form" class="contact-form" method="POST" netlify>
+                    <div class="form-grid">
                         <div class="form-group">
-                            <label for="email" class="required">Adres e-mail</label>
-                            <input type="email" id="email" name="email" required placeholder="twoj@email.com">
+                            <label for="fname" class="required">Imię</label>
+                            <input type="text" id="fname" name="fname" required placeholder="Twoje imię">
                             <span class="error-message"></span>
                         </div>
                         <div class="form-group">
-                            <label for="phone" class="required">Numer telefonu</label>
-                            <input type="tel" id="phone" name="phone" required placeholder="123 456 789">
-                            <span class="error-message"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-step">
-                        <h3>📊 Poziom językowy</h3>
-                        <div class="form-group level-select">
-                            <label for="level" class="required">Twój obecny poziom:</label>
-                            <select id="level" name="level" required>
-                                <option value="">Wybierz poziom</option>
-                                <option value="0">0 - Brak znajomości</option>
-                                <option value="1">A1 - Początkujący</option>
-                                <option value="2">A1/A2 - Między poziomami</option>
-                                <option value="3">A2 - Podstawowy</option>
-                                <option value="4">A2/B1 - Między poziomami</option>
-                                <option value="5" selected>B1 - Średnio-zaawansowany</option>
-                                <option value="6">B1/B2 - Między poziomami</option>
-                                <option value="7">B2 - Wyższy średnio-zaawansowany</option>
-                                <option value="8">B2/C1 - Między poziomami</option>
-                                <option value="9">C1 - Zaawansowany</option>
-                                <option value="10">C2 - Poziom biegły</option>
-                            </select>
-                            <span class="error-message"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-step">
-                        <h3>🎯 Cel nauki</h3>
-                        <div class="form-group">
-                            <label class="required">Jaki jest Twój główny cel nauki?</label>
-                            <div class="goal-select">
-                                <div class="goal-option">
-                                    <input type="radio" id="goal-work" name="goal" value="praca" required>
-                                    <label for="goal-work">💼 Do Pracy</label>
-                                </div>
-                                <div class="goal-option">
-                                    <input type="radio" id="goal-travel" name="goal" value="wyjazd">
-                                    <label for="goal-travel">✈️ Na Wyjazd</label>
-                                </div>
-                                <div class="goal-option">
-                                    <input type="radio" id="goal-exam" name="goal" value="egzamin">
-                                    <label for="goal-exam">📚 Do Egzaminu</label>
-                                </div>
-                                <div class="goal-option">
-                                    <input type="radio" id="goal-hobby" name="goal" value="hobby">
-                                    <label for="goal-hobby">🎨 Dla Siebie</label>
-                                </div>
-                                <div class="goal-option">
-                                    <input type="radio" id="goal-family" name="goal" value="rodzina">
-                                    <label for="goal-family">👨‍👩‍👧‍👦 Dla Rodziny</label>
-                                </div>
-                                <div class="goal-option">
-                                    <input type="radio" id="goal-other" name="goal" value="inny">
-                                    <label for="goal-other">🎯 Inny Cel</label>
-                                </div>
-                            </div>
-                            <span class="error-message"></span>
-                        </div>
-                        
-                        <div class="form-group" id="other-goal-wrapper" style="display: none;">
-                            <label for="other-goal-text">Opisz swój cel:</label>
-                            <input type="text" id="other-goal-text" name="other-goal-text" placeholder="np. przygotowanie do konkretnego egzaminu...">
+                            <label for="lname" class="required">Nazwisko</label>
+                            <input type="text" id="lname" name="lname" required placeholder="Twoje nazwisko">
                             <span class="error-message"></span>
                         </div>
                     </div>
                     
-                    <div class="form-step">
-                        <h3>💭 Dodatkowe informacje (opcjonalnie)</h3>
-                        <div class="form-group">
-                            <label for="message">Twoja wiadomość:</label>
-                            <textarea id="message" name="message" rows="4" placeholder="Powiedz mi więcej o swoich celach językowych, doświadczeniu lub pytaniach..."></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label for="email" class="required">Adres e-mail</label>
+                        <input type="email" id="email" name="email" required placeholder="twoj@email.com">
+                        <span class="error-message"></span>
                     </div>
                     
-                    <div id="form-main-error" class="error-message main-error"></div>
+                    <div class="form-group">
+                        <label for="phone" class="required">Numer telefonu</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="123 456 789">
+                        <span class="error-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="level" class="required">Twój obecny poziom językowy</label>
+                        <select id="level" name="level" required>
+                            <option value="">Wybierz poziom</option>
+                            <option value="A1">A1 - Początkujący</option>
+                            <option value="A2">A2 - Podstawowy</option>
+                            <option value="B1">B1 - Średnio-zaawansowany</option>
+                            <option value="B2">B2 - Wyższy średnio-zaawansowany</option>
+                            <option value="C1">C1 - Zaawansowany</option>
+                            <option value="C2">C2 - Poziom biegły</option>
+                            <option value="brak">Brak znajomości</option>
+                        </select>
+                        <span class="error-message"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Twoja wiadomość (opcjonalnie)</label>
+                        <textarea id="message" name="message" rows="4" placeholder="Powiedz mi więcej o swoich celach językowych, doświadczeniu lub pytaniach..."></textarea>
+                    </div>
+                    
+                    <div id="form-main-error" class="main-error"></div>
+                    
                     <button type="submit" class="btn-submit">
-                        <span class="btn-text">📤 Wyślij wiadomość</span>
+                        <span class="btn-text">Wyślij wiadomość</span>
                     </button>
                 </form>
                 
-                <div id="form-success-state" class="form-success-state">
+                <div id="form-success-state" class="form-success-state" style="display: none;">
                     <div class="success-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 6L9 17L4 12"/>
@@ -169,7 +118,7 @@
                         </svg>
                     </div>
                     <h3>📧 E-mail</h3>
-                    <p>Napisz do mnie bezpośrednio na adres:</p>
+                    <p>Napisz do mnie bezpośrednio:</p>
                     <a href="mailto:bar.plociennik@gmail.com" class="btn-secondary">bar.plociennik@gmail.com</a>
                 </div>
                 <div class="feature-item reveal-element">
@@ -179,7 +128,7 @@
                         </svg>
                     </div>
                     <h3>📞 Telefon</h3>
-                    <p>Zadzwoń, jeśli masz pilne pytania:</p>
+                    <p>Zadzwoń w pilnych sprawach:</p>
                     <a href="tel:+48661576007" class="btn-secondary">+48 661 576 007</a>
                 </div>
                 <div class="feature-item reveal-element">
@@ -189,8 +138,8 @@
                         </svg>
                     </div>
                     <h3>⏰ Czas odpowiedzi</h3>
-                    <p>Odpowiadam na wiadomości zwykle w ciągu 24 godzin, w dni robocze jeszcze szybciej.</p>
-                    <p><strong>Godziny dostępności:</strong><br>Pon-Pt: 9:00-20:00<br>Sob: 10:00-16:00</p>
+                    <p>Odpowiadam zwykle w ciągu 24 godzin.</p>
+                    <p><strong>Dostępność:</strong><br>Pon-Pt: 9:00-20:00<br>Sob: 10:00-16:00</p>
                 </div>
             </div>
         </section>
@@ -216,13 +165,17 @@
                 <div class="footer-column contact">
                     <h4>Kontakt</h4>
                     <p>
-                        <a href="mailto:bar.plociennik@gmail.com">bar.plociennik@gmail.com</a><br>
+                        <strong>E-mail:</strong><br>
+                        <a href="mailto:bar.plociennik@gmail.com">bar.plociennik@gmail.com</a>
+                    </p>
+                    <p>
+                        <strong>Telefon:</strong><br>
                         <a href="tel:+48661576007">+48 661 576 007</a>
                     </p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© Bartłomiej Płóciennik 2025</p>
+                <p>© 2025 Bartłomiej Płóciennik. Wszystkie prawa zastrzeżone.</p>
                 <div class="author-credit">
                     <span>Stworzone przez</span>
                     <a href="#" target="_blank" rel="noopener noreferrer" class="author-name">Wroblewski</a>
