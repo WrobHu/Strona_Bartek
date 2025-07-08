@@ -31,51 +31,91 @@
             </ul>
         </nav>
         <button class="hamburger-menu" id="hamburger-btn" aria-label="Otwórz menu">
-            <span class="line"></span>
-            <span class="line"></span>
-            <span class="line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
         </button>
     </header>
 
     <main>
         <section class="hero-section">
-            <h1 class="animated-headline">Porozmawiajmy<br>bez barier.</h1>
+            <div class="hero-content">
+                <h1 class="animated-headline">Porozmawiajmy<br>bez barier.</h1>
+                <p class="hero-description reveal-element">Odkryj radość z płynnej komunikacji i przełam językowe bariery raz na zawsze.</p>
+                <div class="hero-actions reveal-element">
+                    <a href="kontakt.html" class="btn-primary">Zacznij naukę</a>
+                    <a href="cennik.html" class="btn-secondary">Zobacz cennik</a>
+                </div>
+            </div>
         </section>
 
         <section class="content-section">
             <h2 class="section-title reveal-element">Nauka języka to nie wkuwanie słówek. To odkrywanie nowych światów.</h2>
-            <p class="reveal-element">Nazywam się Bartłomiej Płóciennik i pomogę Ci nie tylko opanować język, ale poczuć się w nim swobodnie i pewnie. Moja metoda to połączenie sprawdzonych technik z indywidualnym podejściem, które zamienia naukę w pasję.</p>
+            <p class="section-description reveal-element">Nazywam się Bartłomiej Płóciennik i pomogę Ci nie tylko opanować język, ale poczuć się w nim swobodnie i pewnie. Moja metoda to połączenie sprawdzonych technik z indywidualnym podejściem, które zamienia naukę w pasję.</p>
         </section>
 
         <section class="content-section">
             <div class="features-grid">
                 <div class="feature-item reveal-element">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
                     <h3>Indywidualne Podejście</h3>
                     <p>Program nauczania jest w 100% dopasowany do Twoich celów, tempa i zainteresowań.</p>
                 </div>
                 <div class="feature-item reveal-element">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+                        </svg>
+                    </div>
                     <h3>Praktyczne Metody</h3>
                     <p>Skupiamy się na realnych sytuacjach i żywym języku, abyś od razu mógł/mogła wykorzystać zdobytą wiedzę.</p>
                 </div>
                 <div class="feature-item reveal-element">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM10 5.47l4 1.4v11.66l-4-1.4V5.47zm-5 .99l3-1.01v11.7l-3 1.16V6.46zm14 11.08l-3 1.01V6.86l3-1.16v11.84z"/>
+                        </svg>
+                    </div>
                     <h3>Elastyczność Online</h3>
                     <p>Ucz się z dowolnego miejsca na świecie w godzinach, które Ci odpowiadają.</p>
                 </div>
             </div>
         </section>
 
-        <section class="content-section">
+        <section class="content-section testimonials-section">
              <h3 class="section-subtitle reveal-element">Zaufali mi:</h3>
-             <div class="testimonial-wrapper">
-                <div class="testimonial reveal-element">
-                    <blockquote>"Dzięki Bartkowi w końcu przełamałam barierę w mówieniu. Lekcje to czysta przyjemność!"</blockquote>
-                    <cite>– Anna K.</cite>
+             <div class="testimonials-grid">
+                <div class="testimonial-card reveal-element">
+                    <div class="testimonial-content">
+                        <blockquote>"Dzięki Bartkowi w końcu przełamałam barierę w mówieniu. Lekcje to czysta przyjemność!"</blockquote>
+                        <cite>– Anna K.</cite>
+                    </div>
+                    <div class="testimonial-rating">
+                        <span class="stars">★★★★★</span>
+                    </div>
                 </div>
-                 <div class="testimonial reveal-element">
-                    <blockquote>"Profesjonalizm i świetna atmosfera. Przygotowanie do egzaminu DELF na najwyższym poziomie."</blockquote>
-                    <cite>– Piotr S.</cite>
+                 <div class="testimonial-card reveal-element">
+                    <div class="testimonial-content">
+                        <blockquote>"Profesjonalizm i świetna atmosfera. Przygotowanie do egzaminu DELF na najwyższym poziomie."</blockquote>
+                        <cite>– Piotr S.</cite>
+                    </div>
+                    <div class="testimonial-rating">
+                        <span class="stars">★★★★★</span>
+                    </div>
                 </div>
              </div>
+        </section>
+
+        <section class="cta-section reveal-element">
+            <div class="cta-content">
+                <h2>Gotowy na pierwszą lekcję?</h2>
+                <p>Umów się na bezpłatną konsultację i zobacz, jak szybko możesz robić postępy.</p>
+                <a href="kontakt.html" class="btn-cta">Umów bezpłatną lekcję</a>
+            </div>
         </section>
     </main>
 
