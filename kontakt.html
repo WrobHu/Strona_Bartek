@@ -42,7 +42,7 @@
 
         <section class="content-section form-section">
             <div class="form-container reveal-element">
-                <form id="contact-form" class="contact-form" novalidate data-netlify="true">
+                <form id="contact-form" class="contact-form" novalidate>
 
                     <div class="form-step">
                         <h3>📝 Podstawowe informacje</h3>
@@ -71,94 +71,72 @@
                     </div>
 
                     <div class="form-step">
-                        <h3>📊 Twój poziom językowy</h3>
-                        <fieldset class="form-group">
-                            <legend class="required">Oceń swój obecny poziom językowy:</legend>
-                            <div class="slider-container">
-                                <div class="slider-value" id="slider-value">5</div>
-                                <div class="slider-wrapper">
-                                    <button type="button" class="slider-btn" id="slider-decrement" aria-label="Zmniejsz poziom">-</button>
-                                    <div class="custom-slider" id="custom-slider-track">
-                                        <div class="custom-slider-progress" id="custom-slider-progress"></div>
-                                        <div class="custom-slider-thumb" id="custom-slider-thumb"></div>
-                                    </div>
-                                    <button type="button" class="slider-btn" id="slider-increment" aria-label="Zwiększ poziom">+</button>
-                                </div>
-                                <div class="slider-legend" id="slider-legend">B1 - Średnio-zaawansowany</div>
-                                <input type="hidden" id="level-slider" name="level" value="5" required>
-                            </div>
+                        <h3>📊 Poziom językowy</h3>
+                        <div class="form-group level-select">
+                            <label for="level" class="required">Twój obecny poziom:</label>
+                            <select id="level" name="level" required>
+                                <option value="">Wybierz poziom</option>
+                                <option value="0">0 - Brak znajomości</option>
+                                <option value="1">A1 - Początkujący</option>
+                                <option value="2">A1/A2 - Między poziomami</option>
+                                <option value="3">A2 - Podstawowy</option>
+                                <option value="4">A2/B1 - Między poziomami</option>
+                                <option value="5" selected>B1 - Średnio-zaawansowany</option>
+                                <option value="6">B1/B2 - Między poziomami</option>
+                                <option value="7">B2 - Wyższy średnio-zaawansowany</option>
+                                <option value="8">B2/C1 - Między poziomami</option>
+                                <option value="9">C1 - Zaawansowany</option>
+                                <option value="10">C2 - Poziom biegły</option>
+                            </select>
                             <span class="error-message"></span>
-                        </fieldset>
+                        </div>
                     </div>
 
                     <div class="form-step">
                         <h3>🎯 Cel nauki</h3>
-                        <fieldset class="form-group">
-                            <legend class="required">Jaki jest Twój główny cel nauki?</legend>
-                            <div class="radio-card-group">
-                                <label class="radio-card">
-                                    <input type="radio" name="goal" value="praca" required>
-                                    <span class="card-content">
-                                        <strong>💼 Do Pracy</strong><br>
-                                        <small>Business English, rozmowy kwalifikacyjne</small>
-                                    </span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="goal" value="wyjazd">
-                                    <span class="card-content">
-                                        <strong>✈️ Na Wyjazd</strong><br>
-                                        <small>Turystyka, relokacja</small>
-                                    </span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="goal" value="egzamin">
-                                    <span class="card-content">
-                                        <strong>📚 Do Egzaminu</strong><br>
-                                        <small>IELTS, FCE, DELF</small>
-                                    </span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="goal" value="hobby">
-                                    <span class="card-content">
-                                        <strong>🎨 Dla Siebie</strong><br>
-                                        <small>Hobby, filmy, książki</small>
-                                    </span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="goal" value="rodzina">
-                                    <span class="card-content">
-                                        <strong>👨‍👩‍👧‍👦 Dla Rodziny</strong><br>
-                                        <small>Wspólna nauka</small>
-                                    </span>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="goal" value="inny">
-                                    <span class="card-content">
-                                        <strong>🎯 Inny Cel</strong><br>
-                                        <small>Opisz poniżej</small>
-                                    </span>
-                                </label>
-                            </div>
-                            <div class="other-goal-wrapper" id="other-goal-wrapper">
-                                <div class="form-group">
-                                    <label for="other-goal-text">Proszę, opisz swój cel</label>
-                                    <input type="text" id="other-goal-text" name="other-goal-text" placeholder="np. przygotowanie do konkretnego egzaminu, specjalistyczna terminologia...">
-                                    <span class="error-message"></span>
+                        <div class="form-group">
+                            <label class="required">Jaki jest Twój główny cel nauki?</label>
+                            <div class="goal-select">
+                                <div class="goal-option">
+                                    <input type="radio" id="goal-work" name="goal" value="praca" required>
+                                    <label for="goal-work">💼 Do Pracy</label>
+                                </div>
+                                <div class="goal-option">
+                                    <input type="radio" id="goal-travel" name="goal" value="wyjazd">
+                                    <label for="goal-travel">✈️ Na Wyjazd</label>
+                                </div>
+                                <div class="goal-option">
+                                    <input type="radio" id="goal-exam" name="goal" value="egzamin">
+                                    <label for="goal-exam">📚 Do Egzaminu</label>
+                                </div>
+                                <div class="goal-option">
+                                    <input type="radio" id="goal-hobby" name="goal" value="hobby">
+                                    <label for="goal-hobby">🎨 Dla Siebie</label>
+                                </div>
+                                <div class="goal-option">
+                                    <input type="radio" id="goal-family" name="goal" value="rodzina">
+                                    <label for="goal-family">👨‍👩‍👧‍👦 Dla Rodziny</label>
+                                </div>
+                                <div class="goal-option">
+                                    <input type="radio" id="goal-other" name="goal" value="inny">
+                                    <label for="goal-other">🎯 Inny Cel</label>
                                 </div>
                             </div>
-                             <span class="error-message radio-error"></span>
-                        </fieldset>
+                            <span class="error-message"></span>
+                        </div>
+                        
+                        <div class="form-group" id="other-goal-wrapper" style="display: none;">
+                            <label for="other-goal-text">Opisz swój cel:</label>
+                            <input type="text" id="other-goal-text" name="other-goal-text" placeholder="np. przygotowanie do konkretnego egzaminu...">
+                            <span class="error-message"></span>
+                        </div>
                     </div>
                     
                     <div class="form-step">
-                        <h3>💭 Dodatkowe informacje</h3>
+                        <h3>💭 Dodatkowe informacje (opcjonalnie)</h3>
                         <div class="form-group">
-                            <label for="current-learning">Czy uczysz się aktualnie języka? (opcjonalnie)</label>
-                            <textarea id="current-learning" name="current-learning" rows="4" placeholder="Jeśli tak, napisz jakiego i w jaki sposób. Czy masz ulubione materiały do nauki? Jakiej pomocy potrzebujesz najbardziej?"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="preferred-time">Preferowane godziny lekcji (opcjonalnie)</label>
-                            <input type="text" id="preferred-time" name="preferred-time" placeholder="np. wieczorem po 18:00, weekendy">
+                            <label for="message">Twoja wiadomość:</label>
+                            <textarea id="message" name="message" rows="4" placeholder="Powiedz mi więcej o swoich celach językowych, doświadczeniu lub pytaniach..."></textarea>
                         </div>
                     </div>
                     
