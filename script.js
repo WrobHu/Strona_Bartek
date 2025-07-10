@@ -1,32 +1,83 @@
-// === UPROSZCZONY JAVASCRIPT v4.0 - WORKING VERSION ===
+// === ELEGANCKI I WYDAJNY JAVASCRIPT - BARTŁOMIEJ PŁÓCIENNIK ===
 
-class SimpleApp {
+class ElegantApp {
     constructor() {
+        this.isInitialized = false;
+        this.animations = new Map();
+        this.observers = new Map();
+        this.rafId = null;
+        
         this.init();
     }
 
     init() {
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.initialize());
+            document.addEventListener('DOMContentLoaded', () => this.initialize(), { once: true });
         } else {
             this.initialize();
         }
     }
 
     initialize() {
-        console.log('🚀 Initializing simple app...');
+        if (this.isInitialized) return;
         
-        // Core functionality
-        this.initializeMobileMenu();
-        this.initializeForm();
-        this.initializeCTAPopup();
-        this.initializeScrollEffects();
-        this.initializeSmoothScroll();
+        console.log('🚀 Initializing elegant app...');
         
-        console.log('✅ App initialized successfully');
+        try {
+            // Core functionality
+            this.initializeHeader();
+            this.initializeMobileMenu();
+            this.initializeForm();
+            this.initializeCTAPopup();
+            this.initializeScrollEffects();
+            this.initializeSmoothScroll();
+            this.initializeMouseGradient();
+            this.initializeFloatingWords();
+            this.initializePerformanceOptimizations();
+            
+            this.isInitialized = true;
+            console.log('✅ App initialized successfully');
+        } catch (error) {
+            console.error('❌ App initialization failed:', error);
+        }
     }
 
-    // === MOBILE MENU - NAPRAWIONE ===
+    // === HEADER & SCROLL EFFECTS ===
+    initializeHeader() {
+        const header = document.querySelector('.main-header');
+        if (!header) return;
+
+        let lastScrollY = window.pageYOffset;
+        let isScrolled = false;
+
+        const updateHeader = () => {
+            const currentScrollY = window.pageYOffset;
+            const scrolledNow = currentScrollY > 50;
+
+            if (scrolledNow !== isScrolled) {
+                isScrolled = scrolledNow;
+                header.classList.toggle('scrolled', isScrolled);
+            }
+
+            lastScrollY = currentScrollY;
+        };
+
+        // Throttled scroll handler
+        let scrollTimeout;
+        const handleScroll = () => {
+            if (!scrollTimeout) {
+                scrollTimeout = requestAnimationFrame(() => {
+                    updateHeader();
+                    scrollTimeout = null;
+                });
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        console.log('✅ Header scroll effects initialized');
+    }
+
+    // === MOBILE MENU ===
     initializeMobileMenu() {
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const mainNav = document.getElementById('main-nav');
@@ -37,79 +88,103 @@ class SimpleApp {
             return;
         }
 
-        // Ensure hamburger lines exist
-        if (!hamburgerBtn.querySelector('.hamburger-line')) {
-            hamburgerBtn.innerHTML = `
+        // Ensure hamburger structure
+        this.ensureHamburgerStructure(hamburgerBtn);
+
+        // State management
+        let isOpen = false;
+
+        const toggleMenu = (open = !isOpen) => {
+            isOpen = open;
+            
+            hamburgerBtn.classList.toggle('active', isOpen);
+            mainNav.classList.toggle('mobile-active', isOpen);
+            header?.classList.toggle('nav-open', isOpen);
+            document.body.classList.toggle('nav-open', isOpen);
+            
+            // Accessibility
+            hamburgerBtn.setAttribute('aria-expanded', isOpen);
+            mainNav.setAttribute('aria-hidden', !isOpen);
+        };
+
+        const closeMenu = () => toggleMenu(false);
+
+        // Event listeners
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu();
+        });
+
+        // Close on nav link click
+        mainNav.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A' && isOpen) {
+                closeMenu();
+            }
+        });
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+            if (isOpen && 
+                !mainNav.contains(e.target) && 
+                !hamburgerBtn.contains(e.target)) {
+                closeMenu();
+            }
+        });
+
+        // Close on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                closeMenu();
+                hamburgerBtn.focus();
+            }
+        });
+
+        // Close on resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && isOpen) {
+                closeMenu();
+            }
+        }, { passive: true });
+
+        console.log('✅ Mobile menu initialized');
+    }
+
+    ensureHamburgerStructure(button) {
+        if (!button.querySelector('.hamburger-line')) {
+            button.innerHTML = `
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
                 <span class="hamburger-line"></span>
             `;
         }
-
-        // Toggle menu
-        hamburgerBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const isActive = hamburgerBtn.classList.toggle('active');
-            mainNav.classList.toggle('mobile-active', isActive);
-            
-            if (header) {
-                header.classList.toggle('nav-open', isActive);
-            }
-            
-            document.body.classList.toggle('nav-open', isActive);
-            
-            console.log('Menu toggled:', isActive ? 'open' : 'closed');
-        });
-
-        // Close menu when clicking nav links
-        mainNav.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A') {
-                this.closeMobileMenu();
-            }
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (hamburgerBtn.classList.contains('active') && 
-                !mainNav.contains(e.target) && 
-                !hamburgerBtn.contains(e.target)) {
-                this.closeMobileMenu();
-            }
-        });
-
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && hamburgerBtn.classList.contains('active')) {
-                this.closeMobileMenu();
-            }
-        });
-
-        console.log('✅ Mobile menu initialized');
+        
+        // Accessibility attributes
+        button.setAttribute('aria-label', 'Toggle navigation menu');
+        button.setAttribute('aria-expanded', 'false');
     }
 
-    closeMobileMenu() {
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const mainNav = document.getElementById('main-nav');
-        const header = document.querySelector('.main-header');
-
-        if (hamburgerBtn) hamburgerBtn.classList.remove('active');
-        if (mainNav) mainNav.classList.remove('mobile-active');
-        if (header) header.classList.remove('nav-open');
-        document.body.classList.remove('nav-open');
-    }
-
-    // === UPROSZCZONY FORMULARZ ===
+    // === FORMULARZ ===
     initializeForm() {
         const form = document.getElementById('contact-form');
         if (!form) return;
 
-        console.log('✅ Initializing simple form...');
+        console.log('✅ Initializing elegant form...');
 
-        // Form elements
-        const elements = {
-            form: form,
+        const elements = this.getFormElements(form);
+        
+        // Setup form handlers
+        this.setupPhoneFormatting(elements.phoneInput);
+        this.setupGoalSelection(elements);
+        this.setupValidation(form);
+        this.setupFormSubmission(form, elements);
+
+        console.log('✅ Form initialized');
+    }
+
+    getFormElements(form) {
+        return {
+            form,
             submitButton: form.querySelector('.btn-submit'),
             successState: document.getElementById('form-success-state'),
             mainError: document.getElementById('form-main-error'),
@@ -118,54 +193,48 @@ class SimpleApp {
             otherGoalWrapper: document.getElementById('other-goal-wrapper'),
             otherGoalInput: document.getElementById('other-goal-text')
         };
+    }
 
-        // Phone formatting
-        if (elements.phoneInput) {
-            elements.phoneInput.addEventListener('input', (e) => {
-                let input = e.target.value.replace(/\D/g, '').substring(0, 9);
-                e.target.value = input.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
-            });
-        }
+    setupPhoneFormatting(phoneInput) {
+        if (!phoneInput) return;
+        
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '').substring(0, 9);
+            e.target.value = value.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+        });
+    }
 
-        // Goal selection with "other" option
-        elements.goalRadios.forEach(radio => {
+    setupGoalSelection(elements) {
+        const { goalRadios, otherGoalWrapper, otherGoalInput } = elements;
+        
+        goalRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                const otherSelected = radio.value === 'inny' && radio.checked;
+                const isOther = radio.value === 'inny' && radio.checked;
                 
-                if (elements.otherGoalWrapper) {
-                    elements.otherGoalWrapper.style.display = otherSelected ? 'block' : 'none';
+                if (otherGoalWrapper) {
+                    otherGoalWrapper.style.display = isOther ? 'block' : 'none';
                 }
                 
-                if (elements.otherGoalInput) {
-                    elements.otherGoalInput.required = otherSelected;
-                    if (!otherSelected) {
-                        elements.otherGoalInput.value = '';
-                    }
+                if (otherGoalInput) {
+                    otherGoalInput.required = isOther;
+                    if (!isOther) otherGoalInput.value = '';
                 }
             });
         });
+    }
 
-        // Real-time validation
-        const inputs = form.querySelectorAll('input[required], select[required]');
+    setupValidation(form) {
+        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+        
         inputs.forEach(input => {
-            input.addEventListener('blur', () => {
-                this.validateField(input);
-            });
-            
+            // Real-time validation
+            input.addEventListener('blur', () => this.validateField(input));
             input.addEventListener('input', () => {
                 if (input.classList.contains('error')) {
                     this.validateField(input);
                 }
             });
         });
-
-        // Form submission
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleFormSubmit(elements);
-        });
-
-        console.log('✅ Form initialized');
     }
 
     validateField(field) {
@@ -175,12 +244,15 @@ class SimpleApp {
         let message = '';
 
         // Validation rules
-        if (field.required && value === '') {
+        if (field.required && !value) {
             isValid = false;
             message = 'To pole jest wymagane.';
-        } else if (field.type === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-            isValid = false;
-            message = 'Proszę podać poprawny adres e-mail.';
+        } else if (field.type === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                isValid = false;
+                message = 'Proszę podać poprawny adres e-mail.';
+            }
         } else if (field.type === 'tel' && value) {
             const phoneNumber = value.replace(/\s/g, '');
             if (phoneNumber.length < 9) {
@@ -189,7 +261,7 @@ class SimpleApp {
             }
         }
 
-        // Update field style
+        // Update field appearance
         field.classList.remove('valid', 'error');
         if (isValid && value) {
             field.classList.add('valid');
@@ -199,22 +271,25 @@ class SimpleApp {
 
         // Show/hide error message
         if (errorSpan) {
-            if (!isValid && message) {
-                errorSpan.textContent = message;
-                errorSpan.classList.add('visible');
-            } else {
-                errorSpan.classList.remove('visible');
-            }
+            errorSpan.textContent = message;
+            errorSpan.classList.toggle('visible', !isValid && message);
         }
 
         return isValid;
     }
 
+    setupFormSubmission(form, elements) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleFormSubmit(elements);
+        });
+    }
+
     async handleFormSubmit(elements) {
         const { form, submitButton, successState, mainError } = elements;
         
-        // Validate all required fields
-        const requiredFields = form.querySelectorAll('input[required], select[required]');
+        // Validate all fields
+        const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
         let isValid = true;
         
         requiredFields.forEach(field => {
@@ -227,64 +302,71 @@ class SimpleApp {
         const goalSelected = form.querySelector('input[name="goal"]:checked');
         if (!goalSelected) {
             isValid = false;
-            const goalError = form.querySelector('input[name="goal"]')
-                ?.closest('.form-group')?.querySelector('.error-message');
-            if (goalError) {
-                goalError.textContent = 'Proszę wybrać cel nauki.';
-                goalError.classList.add('visible');
-            }
+            this.showFieldError('goal', 'Proszę wybrać cel nauki.');
         }
 
         if (!isValid) {
-            if (mainError) {
-                mainError.textContent = "Proszę uzupełnić wszystkie wymagane pola.";
-                mainError.classList.add('visible');
-            }
+            this.showMainError(mainError, 'Proszę uzupełnić wszystkie wymagane pola.');
             return;
         }
 
-        // Hide error
-        if (mainError) {
-            mainError.classList.remove('visible');
-        }
+        // Hide main error
+        this.hideMainError(mainError);
 
         // Update submit button
-        if (submitButton) {
-            submitButton.disabled = true;
-            const buttonText = submitButton.querySelector('.btn-text');
-            if (buttonText) {
-                buttonText.textContent = 'Wysyłanie...';
-            }
-        }
+        this.setSubmitButtonState(submitButton, true, 'Wysyłanie...');
 
         try {
             // Simulate form submission
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            // Show success
+            await this.simulateFormSubmission();
             this.showFormSuccess(form, successState);
             
         } catch (error) {
             console.error('Form submission failed:', error);
-            if (mainError) {
-                mainError.textContent = 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.';
-                mainError.classList.add('visible');
-            }
+            this.showMainError(mainError, 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.');
         } finally {
-            if (submitButton) {
-                submitButton.disabled = false;
-                const buttonText = submitButton.querySelector('.btn-text');
-                if (buttonText) {
-                    buttonText.textContent = '📤 Wyślij wiadomość';
-                }
-            }
+            this.setSubmitButtonState(submitButton, false, 'Wyślij wiadomość');
         }
+    }
+
+    showFieldError(fieldName, message) {
+        const field = document.querySelector(`input[name="${fieldName}"]`);
+        const errorSpan = field?.closest('.form-group')?.querySelector('.error-message');
+        if (errorSpan) {
+            errorSpan.textContent = message;
+            errorSpan.classList.add('visible');
+        }
+    }
+
+    showMainError(errorElement, message) {
+        if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.classList.add('visible');
+        }
+    }
+
+    hideMainError(errorElement) {
+        if (errorElement) {
+            errorElement.classList.remove('visible');
+        }
+    }
+
+    setSubmitButtonState(button, isLoading, text) {
+        if (!button) return;
+        
+        button.disabled = isLoading;
+        const buttonText = button.querySelector('.btn-text') || button;
+        buttonText.textContent = text;
+    }
+
+    async simulateFormSubmission() {
+        return new Promise(resolve => setTimeout(resolve, 1500));
     }
 
     showFormSuccess(form, successState) {
         if (!successState) return;
 
-        // Hide form
+        // Animate form out
         form.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
         form.style.opacity = '0';
         form.style.transform = 'translateY(-20px)';
@@ -293,6 +375,7 @@ class SimpleApp {
             form.style.display = 'none';
             successState.style.visibility = 'visible';
             successState.style.opacity = '1';
+            successState.classList.add('visible');
         }, 500);
     }
 
@@ -309,13 +392,6 @@ class SimpleApp {
 
         let isOpen = false;
 
-        // Make sure elements are visible
-        openBtn.style.opacity = '1';
-        openBtn.style.visibility = 'visible';
-        modal.style.opacity = '0';
-        modal.style.transform = 'scale(0.8)';
-        modal.style.display = 'none';
-
         const openModal = () => {
             if (isOpen) return;
             isOpen = true;
@@ -323,10 +399,11 @@ class SimpleApp {
             openBtn.style.display = 'none';
             modal.style.display = 'block';
             
-            setTimeout(() => {
+            requestAnimationFrame(() => {
                 modal.style.opacity = '1';
                 modal.style.transform = 'scale(1)';
-            }, 10);
+                modal.classList.add('visible');
+            });
         };
 
         const closeModal = () => {
@@ -335,19 +412,28 @@ class SimpleApp {
             
             modal.style.opacity = '0';
             modal.style.transform = 'scale(0.8)';
+            modal.classList.remove('visible');
             
             setTimeout(() => {
                 modal.style.display = 'none';
                 openBtn.style.display = 'flex';
-            }, 300);
+            }, 250);
         };
 
+        // Event listeners
         openBtn.addEventListener('click', openModal);
         closeBtn.addEventListener('click', closeModal);
-
+        
         // Close on outside click
         popup.addEventListener('click', (e) => {
-            if (e.target === popup) {
+            if (e.target === popup && isOpen) {
+                closeModal();
+            }
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) {
                 closeModal();
             }
         });
@@ -355,40 +441,74 @@ class SimpleApp {
         console.log('✅ CTA popup initialized');
     }
 
-    // === SCROLL EFFECTS ===
+    // === SCROLL EFFECTS & ANIMATIONS ===
     initializeScrollEffects() {
-        // Header scroll effect
-        window.addEventListener('scroll', () => {
-            const header = document.querySelector('.main-header');
-            if (header) {
-                header.classList.toggle('scrolled', window.pageYOffset > 50);
-            }
-        }, { passive: true });
-
-        // Simple reveal animation
-        if ('IntersectionObserver' in window) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animation = 'fadeIn 0.6s ease-out forwards';
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            });
-
-            // Observe reveal elements
-            document.querySelectorAll('.reveal-element, .animated-headline').forEach(element => {
-                // Make sure elements are visible
-                element.style.opacity = '1';
-                element.style.visibility = 'visible';
-                observer.observe(element);
-            });
+        if (!('IntersectionObserver' in window)) {
+            console.warn('IntersectionObserver not supported');
+            return;
         }
 
+        // Reveal animation observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    element.style.animation = 'fadeIn 0.6s ease-out forwards';
+                    element.classList.add('revealed');
+                    revealObserver.unobserve(element);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        // Observe elements for reveal animation
+        const revealElements = document.querySelectorAll('.reveal-element, .feature-item, .pricing-card, .testimonial-card');
+        revealElements.forEach(element => {
+            element.style.opacity = '1';
+            element.style.visibility = 'visible';
+            revealObserver.observe(element);
+        });
+
+        // Parallax effect for images
+        const parallaxObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    this.setupParallax(entry.target);
+                }
+            });
+        });
+
+        document.querySelectorAll('.image-parallax').forEach(img => {
+            parallaxObserver.observe(img);
+        });
+
+        this.observers.set('reveal', revealObserver);
+        this.observers.set('parallax', parallaxObserver);
+        
         console.log('✅ Scroll effects initialized');
+    }
+
+    setupParallax(element) {
+        let isScrolling = false;
+        
+        const updateParallax = () => {
+            const rect = element.getBoundingClientRect();
+            const speed = 0.5;
+            const yPos = -(rect.top * speed);
+            element.style.transform = `translateY(${yPos}px)`;
+            isScrolling = false;
+        };
+
+        const handleScroll = () => {
+            if (!isScrolling) {
+                requestAnimationFrame(updateParallax);
+                isScrolling = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
     }
 
     // === SMOOTH SCROLL ===
@@ -398,61 +518,420 @@ class SimpleApp {
                 const lenis = new Lenis({
                     duration: 1.2,
                     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                    smooth: true
+                    smooth: true,
+                    smoothTouch: false,
+                    touchMultiplier: 2
                 });
 
-                function raf(time) {
+                const raf = (time) => {
                     lenis.raf(time);
                     requestAnimationFrame(raf);
-                }
-                requestAnimationFrame(raf);
+                };
+                
+                this.rafId = requestAnimationFrame(raf);
+                this.lenis = lenis;
 
                 console.log('✅ Smooth scroll initialized');
             } catch (error) {
-                console.warn('Smooth scroll failed:', error);
+                console.warn('Smooth scroll initialization failed:', error);
             }
         }
     }
 
-    // === FLOATING WORDS (optional) ===
+    // === MOUSE GRADIENT EFFECT ===
+    initializeMouseGradient() {
+        const gradient = document.querySelector('.mouse-gradient-background');
+        if (!gradient) return;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let isMoving = false;
+
+        const updateGradient = () => {
+            gradient.style.transform = `translate(${mouseX - 200}px, ${mouseY - 200}px)`;
+            isMoving = false;
+        };
+
+        const handleMouseMove = (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            if (!isMoving) {
+                requestAnimationFrame(updateGradient);
+                isMoving = true;
+            }
+        };
+
+        // Only on desktop for performance
+        if (window.innerWidth > 768) {
+            document.addEventListener('mousemove', handleMouseMove, { passive: true });
+        }
+
+        console.log('✅ Mouse gradient initialized');
+    }
+
+    // === FLOATING WORDS ===
     initializeFloatingWords() {
         const container = document.getElementById('floating-words-container');
         if (!container || window.innerWidth < 768) return;
 
         const words = [
-            'Hello', 'Bonjour', 'Płynność', 'Fluency', 'Grammar', 'Conversation', 'Cześć', 
-            'Apprendre', 'Learn', 'Merci', 'Thanks', 'Język', 'Słowa', 'Words', 'Dialogue',
-            'EN', 'FR', 'PL', 'Parler', 'Speak', 'Écouter', 'Listen', 'Culture', 'Sukces'
+            'Hello', 'Bonjour', 'Płynność', 'Fluency', 'Grammar', 'Conversation', 
+            'Cześć', 'Apprendre', 'Learn', 'Merci', 'Thanks', 'Język', 'Słowa', 
+            'Words', 'Dialogue', 'EN', 'FR', 'PL', 'Parler', 'Speak', 'Écouter', 
+            'Listen', 'Culture', 'Sukces', 'Success', 'Accent', 'Pronunciation'
         ];
         
-        const wordCount = Math.min(25, Math.floor(window.innerWidth / 50));
+        const wordCount = Math.min(20, Math.floor(window.innerWidth / 80));
         
         for (let i = 0; i < wordCount; i++) {
             const word = document.createElement('span');
             word.className = 'floating-word';
             word.textContent = words[i % words.length];
+            
+            // Random positioning
             word.style.left = Math.random() * (window.innerWidth - 100) + 'px';
             word.style.top = Math.random() * (window.innerHeight - 50) + 'px';
-            word.style.opacity = Math.random() * 0.1 + 0.05;
+            word.style.opacity = Math.random() * 0.06 + 0.02;
+            word.style.animationDelay = Math.random() * 8 + 's';
+            word.style.animationDuration = (Math.random() * 4 + 8) + 's';
+            
             container.appendChild(word);
         }
         
         console.log('✅ Floating words initialized');
     }
+
+    // === PERFORMANCE OPTIMIZATIONS ===
+    initializePerformanceOptimizations() {
+        // Reduce motion for users who prefer it
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.style.setProperty('--transition-fast', '0.01ms');
+            document.documentElement.style.setProperty('--transition-normal', '0.01ms');
+            document.documentElement.style.setProperty('--transition-slow', '0.01ms');
+            
+            // Remove floating words animation
+            const floatingWords = document.querySelectorAll('.floating-word');
+            floatingWords.forEach(word => {
+                word.style.animation = 'none';
+            });
+        }
+
+        // Intersection observer for lazy loading
+        this.setupLazyLoading();
+
+        // Preload critical resources
+        this.preloadCriticalResources();
+
+        // Setup resize handler with debouncing
+        this.setupResizeHandler();
+
+        console.log('✅ Performance optimizations initialized');
+    }
+
+    setupLazyLoading() {
+        if (!('IntersectionObserver' in window)) return;
+
+        const imageObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                    }
+                    imageObserver.unobserve(img);
+                }
+            });
+        });
+
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+
+        this.observers.set('images', imageObserver);
+    }
+
+    preloadCriticalResources() {
+        const criticalFonts = [
+            'https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@700&display=swap'
+        ];
+
+        criticalFonts.forEach(font => {
+            const link = document.createElement('link');
+            link.rel = 'preload';
+            link.as = 'style';
+            link.href = font;
+            document.head.appendChild(link);
+        });
+    }
+
+    setupResizeHandler() {
+        let resizeTimeout;
+        
+        const handleResize = () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // Recalculate floating words on resize
+                if (window.innerWidth <= 768) {
+                    const container = document.getElementById('floating-words-container');
+                    if (container) {
+                        container.innerHTML = '';
+                    }
+                } else if (window.innerWidth > 768) {
+                    this.initializeFloatingWords();
+                }
+                
+                // Update mouse gradient
+                this.initializeMouseGradient();
+            }, 250);
+        };
+
+        window.addEventListener('resize', handleResize, { passive: true });
+    }
+
+    // === UTILITY METHODS ===
+    
+    // Debounce function for performance
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Throttle function for scroll events
+    throttle(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+
+    // Clean up method
+    destroy() {
+        // Cancel animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+        }
+
+        // Disconnect observers
+        this.observers.forEach(observer => {
+            observer.disconnect();
+        });
+
+        // Clean up Lenis
+        if (this.lenis) {
+            this.lenis.destroy();
+        }
+
+        // Clear animations map
+        this.animations.clear();
+        this.observers.clear();
+
+        console.log('✅ App destroyed and cleaned up');
+    }
 }
 
-// === CSS ANIMATIONS ===
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-`;
-document.head.appendChild(style);
+// === CSS ANIMATIONS INJECTION ===
+const injectAnimations = () => {
+    if (document.getElementById('elegant-animations')) return;
 
-// === INITIALIZE APP ===
-const app = new SimpleApp();
+    const style = document.createElement('style');
+    style.id = 'elegant-animations';
+    style.textContent = `
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+            }
+            50% { 
+                transform: scale(1.05); 
+            }
+        }
+
+        @keyframes floatGentle {
+            0%, 100% { 
+                transform: translateY(0px) rotate(0deg); 
+                opacity: 0.04; 
+            }
+            50% { 
+                transform: translateY(-20px) rotate(1deg); 
+                opacity: 0.12; 
+            }
+        }
+
+        /* Reveal animation classes */
+        .reveal-element {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .revealed {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        /* Loading state animations */
+        .btn-submit:disabled {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit:disabled::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Focus animations */
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            animation: focusPulse 0.3s ease-out;
+        }
+
+        @keyframes focusPulse {
+            0% { 
+                transform: scale(1); 
+                box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.4); 
+            }
+            50% { 
+                transform: scale(1.02); 
+                box-shadow: 0 0 0 5px rgba(0, 102, 204, 0.2); 
+            }
+            100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1); 
+            }
+        }
+
+        /* Success animation */
+        .form-success-state.visible {
+            animation: successSlideIn 0.5s ease-out;
+        }
+
+        @keyframes successSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Hover animations for interactive elements */
+        .feature-item:hover,
+        .pricing-card:hover,
+        .testimonial-card:hover {
+            animation: hoverLift 0.3s ease-out forwards;
+        }
+
+        @keyframes hoverLift {
+            to {
+                transform: translateY(-5px);
+            }
+        }
+    `;
+    
+    document.head.appendChild(style);
+};
+
+// === INITIALIZATION ===
+document.addEventListener('DOMContentLoaded', () => {
+    injectAnimations();
+});
+
+// Initialize app
+const elegantApp = new ElegantApp();
 
 // Make available globally for debugging
-window.app = app;
+window.elegantApp = elegantApp;
+
+// Handle page visibility changes for performance
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // Pause animations when page is hidden
+        document.querySelectorAll('.floating-word').forEach(word => {
+            word.style.animationPlayState = 'paused';
+        });
+    } else {
+        // Resume animations when page is visible
+        document.querySelectorAll('.floating-word').forEach(word => {
+            word.style.animationPlayState = 'running';
+        });
+    }
+});
+
+// Error handling
+window.addEventListener('error', (e) => {
+    console.error('Application error:', e.error);
+});
+
+// Performance monitoring
+if ('performance' in window && 'getEntriesByType' in performance) {
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            console.log(`Page loaded in ${Math.round(perfData.loadEventEnd - perfData.fetchStart)}ms`);
+        }, 0);
+    });
+}
