@@ -1601,31 +1601,59 @@ main {
 }
 
 /* POPRAWKA MOBILE - lepsze pozycjonowanie popup */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .cta-popup {
-    bottom: 1rem;
-    right: 1rem;
-    left: 1rem;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    left: auto;
     width: auto;
   }
   
   .cta-modal {
-    position: fixed;
+    position: absolute;
     bottom: 80px;
-    left: 1rem;
+    right: 0;
+    left: auto;
+    width: 280px;
+    max-width: calc(100vw - 3rem);
+    min-width: 260px;
+    transform-origin: bottom right;
+  }
+  
+  .cta-open-btn {
+    width: 56px;
+    height: 56px;
+    position: relative;
+    right: 0;
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-popup {
+    bottom: 1rem;
     right: 1rem;
+    left: auto;
     width: auto;
-    max-width: none;
-    min-width: auto;
+  }
+  
+  .cta-modal {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    left: auto;
+    width: 260px;
+    max-width: calc(100vw - 2rem);
+    min-width: 240px;
+    transform-origin: bottom right;
   }
   
   .cta-open-btn {
     width: 50px;
     height: 50px;
     position: relative;
-    left: auto;
-    right: auto;
-    margin: 0 auto;
+    right: 0;
+    margin: 0;
   }
 }
 
