@@ -383,6 +383,18 @@ class ModernApp {
             }
         });
 
+        // Specjalna walidacja dla slidera poziomów
+        const levelSlider = document.getElementById('level');
+        if (levelSlider && levelSlider.required) {
+            const levelValue = parseInt(levelSlider.value);
+            if (isNaN(levelValue) || levelValue < 0 || levelValue > 10) {
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = levelSlider;
+                }
+            }
+        }
+
         if (!isValid) {
             this.showMainError(mainError, 'Proszę uzupełnić wszystkie wymagane pola.');
             
