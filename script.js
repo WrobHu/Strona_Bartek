@@ -1,4 +1,36 @@
-// === ULEPSZONA APLIKACJA - BARTŁOMIEJ PŁÓCIENNIK ===
+// Obsługa slidera poziomów
+        const levelSlider = document.getElementById('level');
+        const levelDisplay = document.getElementById('level-display');
+        
+        if (levelSlider && levelDisplay) {
+            const updateLevelDisplay = () => {
+                const value = levelSlider.value;
+                levelDisplay.textContent = value;
+                
+                // Dodaj kolory w zależności od poziomu
+                const container = levelSlider.closest('.level-slider-container');
+                container.classList.remove('level-low', 'level-medium', 'level-high');
+                
+                if (value <= 3) {
+                    container.classList.add('level-low');
+                } else if (value <= 7) {
+                    container.classList.add('level-medium');
+                } else {
+                    container.classList.add('level-high');
+                }
+                
+                // Trigger validation if enabled
+                if (this.formState.validationEnabled) {
+                    this.validateField(levelSlider);
+                }
+            };
+            
+            levelSlider.addEventListener('input', updateLevelDisplay);
+            levelSlider.addEventListener('change', updateLevelDisplay);
+            
+            // Initialize display
+            updateLevelDisplay();
+        }// === ULEPSZONA APLIKACJA - BARTŁOMIEJ PŁÓCIENNIK ===
 
 class ModernApp {
     constructor() {
@@ -81,7 +113,39 @@ class ModernApp {
             return;
         }
 
-        // Upewnij się, że hamburger ma odpowiednią strukturę
+        // Obsługa slidera poziomów
+        const levelSlider = document.getElementById('level');
+        const levelDisplay = document.getElementById('level-display');
+        
+        if (levelSlider && levelDisplay) {
+            const updateLevelDisplay = () => {
+                const value = levelSlider.value;
+                levelDisplay.textContent = value;
+                
+                // Dodaj kolory w zależności od poziomu
+                const container = levelSlider.closest('.level-slider-container');
+                container.classList.remove('level-low', 'level-medium', 'level-high');
+                
+                if (value <= 3) {
+                    container.classList.add('level-low');
+                } else if (value <= 7) {
+                    container.classList.add('level-medium');
+                } else {
+                    container.classList.add('level-high');
+                }
+                
+                // Trigger validation if enabled
+                if (this.formState.validationEnabled) {
+                    this.validateField(levelSlider);
+                }
+            };
+            
+            levelSlider.addEventListener('input', updateLevelDisplay);
+            levelSlider.addEventListener('change', updateLevelDisplay);
+            
+            // Initialize display
+            updateLevelDisplay();
+        } Upewnij się, że hamburger ma odpowiednią strukturę
         if (!hamburgerBtn.querySelector('.hamburger-line')) {
             hamburgerBtn.innerHTML = `
                 <span class="hamburger-line"></span>
