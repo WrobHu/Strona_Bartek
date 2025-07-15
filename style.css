@@ -2602,3 +2602,255 @@ main {
   width: 100%;
   height: 100%;
   background: linear-gradient(90
+/* === SUCCESS STATE - NAPRAWIONE DLA MOBILE === */
+@media (max-width: 768px) {
+  .success-content {
+    max-width: 100%;
+    padding: 0;
+  }
+  
+  .success-content h2 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+  }
+  
+  .success-main-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  
+  .success-next-steps {
+    padding: 1.2rem;
+    margin: 1.2rem 0;
+    text-align: left;
+  }
+  
+  .success-next-steps h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    text-align: left;
+  }
+  
+  .success-next-steps ul {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .success-next-steps li {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    text-align: left;
+  }
+  
+  .success-next-steps li strong {
+    white-space: nowrap;
+  }
+  
+  .success-contact-info {
+    padding: 1.2rem;
+    margin: 1.2rem 0;
+    text-align: left;
+  }
+  
+  .success-contact-info h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    text-align: left;
+  }
+  
+  .success-contact-info p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0.8rem;
+    text-align: left;
+  }
+  
+  .contact-phone {
+    display: block;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* === FOOTER - NAPRAWIONE DLA MOBILE === */
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: left;
+  }
+  
+  .footer-column.about {
+    grid-column: 1;
+    max-width: 100%;
+    text-align: left;
+  }
+  
+  .footer-column .logo-bp {
+    margin-bottom: 1rem;
+    display: block;
+  }
+  
+  .footer-column h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  
+  .footer-column p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.8rem;
+    text-align: left;
+  }
+  
+  .footer-column li {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    text-align: left;
+  }
+  
+  .footer-bottom {
+    flex-direction: column;
+    text-align: left;
+    gap: 0.8rem;
+    padding-top: 1.2rem;
+  }
+  
+  .footer-bottom p {
+    font-size: 0.85rem;
+    text-align: left;
+    margin: 0;
+  }
+  
+  .author-credit {
+    font-size: 0.85rem;
+    text-align: left;
+    justify-content: flex-start;
+  }
+}
+
+/* === FORM SUCCESS STATE - DODATKOWE NAPRAWKI === */
+@media (max-width: 480px) {
+  .form-success-state {
+    padding: 1.5rem 1rem;
+    min-height: 400px;
+  }
+  
+  .success-checkmark {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+  
+  .checkmark {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .success-content h2 {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+  
+  .success-main-text {
+    font-size: 0.95rem;
+    text-align: center;
+    margin-bottom: 1.2rem;
+  }
+  
+  .success-next-steps {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .success-next-steps h3 {
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+  }
+  
+  .success-next-steps li {
+    font-size: 0.85rem;
+    padding: 0.4rem 0;
+    flex-wrap: wrap;
+  }
+  
+  .success-contact-info {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+  
+  .success-contact-info h3 {
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+  }
+  
+  .success-contact-info p {
+    font-size: 0.85rem;
+    margin-bottom: 0.7rem;
+  }
+  
+  .contact-phone {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* === CTA POPUP - NAPRAWKI TEKSTU === */
+@media (max-width: 768px) {
+  .cta-modal h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    text-align: left;
+  }
+  
+  .cta-modal p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  
+  .cta-phone-btn,
+  .cta-form-btn {
+    font-size: 0.9rem;
+    padding: 0.8rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (max-width: 480px) {
+  .cta-modal {
+    padding: 1.5rem;
+  }
+  
+  .cta-modal h3 {
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+  }
+  
+  .cta-modal p {
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .cta-phone-btn,
+  .cta-form-btn {
+    font-size: 0.85rem;
+    padding: 0.7rem;
+  }
+}
