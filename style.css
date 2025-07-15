@@ -1,4 +1,255 @@
-/* === ELEGANCKI JASNY MOTYW - BARTŁOMIEJ PŁÓCIENNIK === */
+/* SUCCESS STATE - KOMPLETNE STYLE */
+.form-success-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-slow);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-background);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+}
+
+.form-success-state.visible {
+  opacity: 1;
+  visibility: visible;
+  position: relative;
+  animation: successFadeIn 0.8s ease-out;
+}
+
+@keyframes successFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animowany checkmark */
+.success-checkmark {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 2rem;
+  position: relative;
+}
+
+.checkmark {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: var(--color-success);
+  stroke-miterlimit: 10;
+  box-shadow: inset 0px 0px 0px var(--color-success);
+  animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark-circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: var(--color-success);
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px var(--color-success);
+  }
+}
+
+/* Success content */
+.success-content {
+  animation: fadeInUp 0.6s ease-out 1.2s both;
+  max-width: 500px;
+  width: 100%;
+}
+
+.success-content h2 {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--color-success);
+  margin-bottom: 1rem;
+  animation: bounceIn 0.6s ease-out 1.4s both;
+}
+
+.success-main-text {
+  font-size: 1.1rem;
+  color: var(--color-text-light);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.success-next-steps {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: left;
+  animation: slideInLeft 0.6s ease-out 1.6s both;
+}
+
+.success-next-steps h3 {
+  font-family: var(--font-heading);
+  color: var(--color-text);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-next-steps ul {
+  list-style: none;
+  padding: 0;
+}
+
+.success-next-steps li {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-light);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  animation: fadeInUp 0.4s ease-out calc(1.8s + var(--delay, 0s)) both;
+}
+
+.success-next-steps li:nth-child(1) { --delay: 0s; }
+.success-next-steps li:nth-child(2) { --delay: 0.1s; }
+.success-next-steps li:nth-child(3) { --delay: 0.2s; }
+.success-next-steps li:nth-child(4) { --delay: 0.3s; }
+
+.success-next-steps li:last-child {
+  border-bottom: none;
+}
+
+.success-contact-info {
+  background: var(--color-accent-light);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin: 2rem 0;
+  animation: slideInRight 0.6s ease-out 2s both;
+}
+
+.success-contact-info h3 {
+  font-family: var(--font-heading);
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.success-contact-info p {
+  margin-bottom: 1rem;
+  color: var(--color-text-light);
+}
+
+.contact-phone {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background: var(--color-accent);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--border-radius-small);
+  font-weight: 600;
+  transition: all var(--transition-normal);
+}
+
+.contact-phone:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}/* === ELEGANCKI JASNY MOTYW - BARTŁOMIEJ PŁÓCIENNIK === */
 
 :root {
   /* Kolory jasnego motywu - ulepszone dla lepszej czytelności */
@@ -1600,7 +1851,7 @@ main {
   display: none;
 }
 
-/* POPRAWKA MOBILE - lepsze pozycjonowanie popup */
+/* NAPRAWKA POPUP MOBILE - prawy róg, wyskakuje do lewej */
 @media (max-width: 768px) {
   .cta-popup {
     bottom: 1.5rem;
@@ -1611,7 +1862,7 @@ main {
   
   .cta-modal {
     position: absolute;
-    bottom: 80px;
+    bottom: 70px;
     right: 0;
     left: auto;
     width: 280px;
@@ -1623,9 +1874,6 @@ main {
   .cta-open-btn {
     width: 56px;
     height: 56px;
-    position: relative;
-    right: 0;
-    margin: 0;
   }
 }
 
@@ -1639,7 +1887,7 @@ main {
   
   .cta-modal {
     position: absolute;
-    bottom: 70px;
+    bottom: 60px;
     right: 0;
     left: auto;
     width: 260px;
@@ -1651,9 +1899,6 @@ main {
   .cta-open-btn {
     width: 50px;
     height: 50px;
-    position: relative;
-    right: 0;
-    margin: 0;
   }
 }
 
