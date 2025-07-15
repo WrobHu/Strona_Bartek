@@ -441,6 +441,7 @@ class ModernApp {
         buttonText.textContent = text;
     }
 
+    // === NAPRAWIONA FUNKCJA SUCCESS STATE ===
     showFormSuccess(form, successState, formContainer) {
         if (!successState || !formContainer) return;
 
@@ -455,7 +456,7 @@ class ModernApp {
         setTimeout(() => {
             form.style.display = 'none';
             
-            // Create success HTML
+            // Create success HTML - NAPRAWIONA STRUKTURA
             successState.innerHTML = `
                 <div class="success-checkmark">
                     <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -473,17 +474,17 @@ class ModernApp {
                     <div class="success-next-steps">
                         <h3>📋 Co dzieje się dalej?</h3>
                         <ul>
-                            <li>✨ Odpowiem Ci w ciągu <strong>24 godzin</strong></li>
-                            <li>📞 Umówimy się na <strong>bezpłatną konsultację</strong></li>
-                            <li>🎯 Ustalimy Twoje cele i poziom językowy</li>
-                            <li>🚀 Rozpoczniemy Twoją przygodę z językiem!</li>
+                            <li>✨ Odpowiem w ciągu <strong>24&nbsp;godzin</strong></li>
+                            <li>📞 Umówimy <strong>bezpłatną&nbsp;konsultację</strong></li>
+                            <li>🎯 Ustalimy Twoje cele językowe</li>
+                            <li>🚀 Rozpoczniemy naukę!</li>
                         </ul>
                     </div>
                     
                     <div class="success-contact-info">
                         <h3>📞 Pilna sprawa?</h3>
-                        <p>Możesz też zadzwonić bezpośrednio:</p>
-                        <a href="tel:+48661576007" class="contact-phone">+48 661 576 007</a>
+                        <p>Możesz też zadzwonić:</p>
+                        <a href="tel:+48661576007" class="contact-phone">📞 661 576 007</a>
                     </div>
                 </div>
             `;
@@ -862,7 +863,6 @@ class ModernApp {
     }
 }
 
-// === CSS ANIMATIONS ===
 const injectAnimations = () => {
     if (document.getElementById('app-animations')) return;
 
