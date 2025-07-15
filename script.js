@@ -322,6 +322,9 @@ class ModernApp {
                 isValid = false;
                 message = 'Numer telefonu musi mieć co najmniej 9 cyfr.';
             }
+        } else if (field.type === 'range' && value) {
+            // Slider poziomów jest zawsze poprawny gdy ma wartość
+            isValid = true;
         } else if (field.tagName === 'SELECT' && value) {
             // Walidacja select
             if (!value || value === '') {
