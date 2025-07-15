@@ -19,6 +19,7 @@ class ModernApp {
         }
     }
 
+    // === INICJALIZACJA Z DEBUGOWANIEM ===
     initialize() {
         if (this.isInitialized) return;
         
@@ -33,6 +34,18 @@ class ModernApp {
             this.initializeSmoothScroll();
             this.initializeMouseGradient();
             this.initializeFloatingWords();
+            
+            // Test popup elements
+            const popup = document.getElementById('cta-popup');
+            const openBtn = document.getElementById('cta-open-btn');
+            const modal = document.querySelector('.cta-modal');
+            
+            console.log('🔍 Popup elements check:', {
+                popup: !!popup,
+                openBtn: !!openBtn,
+                modal: !!modal,
+                isMobile: window.innerWidth <= 768
+            });
             
             this.isInitialized = true;
             console.log('✅ App initialized successfully');
@@ -525,7 +538,7 @@ class ModernApp {
         }
     }
 
-    // === CTA POPUP - ULEPSZONE ===
+    // === CTA POPUP - KOMPLETNIE PRZEPISANE DLA MOBILE ===
     initializeCTAPopup() {
         const popup = document.getElementById('cta-popup');
         if (!popup) return;
@@ -537,31 +550,34 @@ class ModernApp {
         if (!openBtn || !closeBtn || !modal) return;
 
         let isOpen = false;
+        let touchStartTime = 0;
 
         // Ensure initial state
-        openBtn.style.display = 'flex';
-        modal.style.display = 'none';
-        modal.style.opacity = '0';
-        modal.style.transform = 'scale(0.8)';
+        this.resetModalState(openBtn, modal);
 
         const openModal = () => {
             if (isOpen) return;
+            
+            console.log('🔥 Opening CTA modal');
             isOpen = true;
             
-            // Hide button
+            // Hide button immediately
             openBtn.style.display = 'none';
             
-            // Show modal
+            // Show modal with proper positioning
             modal.style.display = 'block';
-            modal.classList.add('visible');
+            modal.style.visibility = 'visible';
+            modal.style.pointerEvents = 'auto';
             
-            // Animate in
+            // Force reflow
+            modal.offsetHeight;
+            
+            // Add visible class for animation
             requestAnimationFrame(() => {
-                modal.style.opacity = '1';
-                modal.style.transform = 'scale(1)';
+                modal.classList.add('visible');
             });
 
-            // Vibration feedback on mobile
+            // Haptic feedback on mobile
             if ('vibrate' in navigator) {
                 navigator.vibrate(50);
             }
@@ -569,35 +585,59 @@ class ModernApp {
 
         const closeModal = () => {
             if (!isOpen) return;
+            
+            console.log('❌ Closing CTA modal');
             isOpen = false;
             
-            // Animate out
-            modal.style.opacity = '0';
-            modal.style.transform = 'scale(0.8)';
+            // Remove visible class
             modal.classList.remove('visible');
             
+            // Wait for animation to complete
             setTimeout(() => {
                 modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+                modal.style.pointerEvents = 'none';
                 openBtn.style.display = 'flex';
             }, 300);
         };
 
-        // Event listeners
-        openBtn.addEventListener('click', (e) => {
+        // Enhanced click/touch handling for open button
+        const handleOpenTouch = (e) => {
             e.preventDefault();
             e.stopPropagation();
+            
+            if (e.type === 'touchstart') {
+                touchStartTime = Date.now();
+                return;
+            }
+            
+            if (e.type === 'touchend') {
+                const touchDuration = Date.now() - touchStartTime;
+                if (touchDuration > 500) return; // Ignore long presses
+            }
+            
             openModal();
-        });
-        
-        closeBtn.addEventListener('click', (e) => {
+        };
+
+        // Enhanced click/touch handling for close button
+        const handleCloseTouch = (e) => {
             e.preventDefault();
             e.stopPropagation();
             closeModal();
-        });
+        };
+
+        // Event listeners with better mobile support
+        openBtn.addEventListener('click', handleOpenTouch);
+        openBtn.addEventListener('touchstart', handleOpenTouch, { passive: false });
+        openBtn.addEventListener('touchend', handleOpenTouch, { passive: false });
         
-        // Close on background click
-        popup.addEventListener('click', (e) => {
-            if (e.target === popup && isOpen) {
+        closeBtn.addEventListener('click', handleCloseTouch);
+        closeBtn.addEventListener('touchstart', handleCloseTouch, { passive: false });
+        closeBtn.addEventListener('touchend', handleCloseTouch, { passive: false });
+        
+        // Close on backdrop click/touch
+        document.addEventListener('click', (e) => {
+            if (isOpen && !modal.contains(e.target) && !openBtn.contains(e.target)) {
                 closeModal();
             }
         });
@@ -605,18 +645,18 @@ class ModernApp {
         // Close on link click
         modal.addEventListener('click', (e) => {
             if (e.target.tagName === 'A') {
-                closeModal();
+                setTimeout(closeModal, 100); // Small delay for UX
             }
         });
 
-        // Close on escape
+        // Close on escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && isOpen) {
                 closeModal();
             }
         });
 
-        // Auto-show logic - pokazuj po 10 sekundach jeśli user nie wchodzi w interakcje
+        // Auto-show with better mobile detection
         let autoShowTimeout;
         let userInteracted = false;
 
@@ -632,7 +672,10 @@ class ModernApp {
             document.addEventListener(event, resetAutoShow, { once: true, passive: true });
         });
 
-        // Auto-show after 10 seconds if no interaction
+        // Auto-show after 15 seconds if no interaction (longer on mobile)
+        const isMobile = window.innerWidth <= 768;
+        const autoShowDelay = isMobile ? 15000 : 10000;
+        
         autoShowTimeout = setTimeout(() => {
             if (!userInteracted && !isOpen) {
                 openModal();
@@ -641,9 +684,22 @@ class ModernApp {
                     if (isOpen) closeModal();
                 }, 8000);
             }
-        }, 10000);
+        }, autoShowDelay);
 
         console.log('✅ Enhanced CTA popup initialized');
+    }
+
+    // Helper method to reset modal state
+    resetModalState(openBtn, modal) {
+        openBtn.style.display = 'flex';
+        openBtn.style.visibility = 'visible';
+        openBtn.style.pointerEvents = 'auto';
+        
+        modal.style.display = 'none';
+        modal.style.visibility = 'hidden';
+        modal.style.pointerEvents = 'none';
+        modal.style.opacity = '0';
+        modal.classList.remove('visible');
     }
 
     // === SCROLL EFFECTS ===
