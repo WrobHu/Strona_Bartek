@@ -538,7 +538,7 @@ class ModernApp {
         }
     }
 
-    // === CTA POPUP - KOMPLETNIE PRZEPISANE DLA MOBILE ===
+    // === CTA POPUP - PROSTSZE I DZIAŁAJĄCE ===
     initializeCTAPopup() {
         const popup = document.getElementById('cta-popup');
         if (!popup) return;
@@ -547,37 +547,30 @@ class ModernApp {
         const closeBtn = document.getElementById('cta-close-btn');
         const modal = popup.querySelector('.cta-modal');
 
-        if (!openBtn || !closeBtn || !modal) return;
+        if (!openBtn || !closeBtn || !modal) {
+            console.warn('CTA popup elements not found');
+            return;
+        }
 
         let isOpen = false;
-        let touchStartTime = 0;
 
-        // Ensure initial state
-        this.resetModalState(openBtn, modal);
+        // Initial state
+        openBtn.style.display = 'flex';
+        modal.style.display = 'none';
 
         const openModal = () => {
             if (isOpen) return;
             
-            console.log('🔥 Opening CTA modal');
+            console.log('Opening CTA modal');
             isOpen = true;
             
-            // Hide button immediately
             openBtn.style.display = 'none';
-            
-            // Show modal with proper positioning
             modal.style.display = 'block';
-            modal.style.visibility = 'visible';
-            modal.style.pointerEvents = 'auto';
             
-            // Force reflow
-            modal.offsetHeight;
-            
-            // Add visible class for animation
-            requestAnimationFrame(() => {
+            setTimeout(() => {
                 modal.classList.add('visible');
-            });
+            }, 10);
 
-            // Haptic feedback on mobile
             if ('vibrate' in navigator) {
                 navigator.vibrate(50);
             }
@@ -586,58 +579,36 @@ class ModernApp {
         const closeModal = () => {
             if (!isOpen) return;
             
-            console.log('❌ Closing CTA modal');
+            console.log('Closing CTA modal');
             isOpen = false;
             
-            // Remove visible class
             modal.classList.remove('visible');
             
-            // Wait for animation to complete
             setTimeout(() => {
                 modal.style.display = 'none';
-                modal.style.visibility = 'hidden';
-                modal.style.pointerEvents = 'none';
                 openBtn.style.display = 'flex';
             }, 300);
         };
 
-        // Enhanced click/touch handling for open button
-        const handleOpenTouch = (e) => {
+        // Simple event listeners
+        openBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
-            if (e.type === 'touchstart') {
-                touchStartTime = Date.now();
-                return;
-            }
-            
-            if (e.type === 'touchend') {
-                const touchDuration = Date.now() - touchStartTime;
-                if (touchDuration > 500) return; // Ignore long presses
-            }
-            
+            console.log('CTA open button clicked');
             openModal();
-        };
-
-        // Enhanced click/touch handling for close button
-        const handleCloseTouch = (e) => {
+        });
+        
+        closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
+            console.log('CTA close button clicked');
             closeModal();
-        };
-
-        // Event listeners with better mobile support
-        openBtn.addEventListener('click', handleOpenTouch);
-        openBtn.addEventListener('touchstart', handleOpenTouch, { passive: false });
-        openBtn.addEventListener('touchend', handleOpenTouch, { passive: false });
+        });
         
-        closeBtn.addEventListener('click', handleCloseTouch);
-        closeBtn.addEventListener('touchstart', handleCloseTouch, { passive: false });
-        closeBtn.addEventListener('touchend', handleCloseTouch, { passive: false });
-        
-        // Close on backdrop click/touch
+        // Close on outside click
         document.addEventListener('click', (e) => {
             if (isOpen && !modal.contains(e.target) && !openBtn.contains(e.target)) {
+                console.log('Closing CTA modal - outside click');
                 closeModal();
             }
         });
@@ -645,61 +616,20 @@ class ModernApp {
         // Close on link click
         modal.addEventListener('click', (e) => {
             if (e.target.tagName === 'A') {
-                setTimeout(closeModal, 100); // Small delay for UX
-            }
-        });
-
-        // Close on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && isOpen) {
+                console.log('Closing CTA modal - link clicked');
                 closeModal();
             }
         });
 
-        // Auto-show with better mobile detection
-        let autoShowTimeout;
-        let userInteracted = false;
-
-        const resetAutoShow = () => {
-            userInteracted = true;
-            if (autoShowTimeout) {
-                clearTimeout(autoShowTimeout);
+        // Close on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && isOpen) {
+                console.log('Closing CTA modal - escape key');
+                closeModal();
             }
-        };
-
-        // Track user interactions
-        ['click', 'scroll', 'touchstart', 'keydown'].forEach(event => {
-            document.addEventListener(event, resetAutoShow, { once: true, passive: true });
         });
 
-        // Auto-show after 15 seconds if no interaction (longer on mobile)
-        const isMobile = window.innerWidth <= 768;
-        const autoShowDelay = isMobile ? 15000 : 10000;
-        
-        autoShowTimeout = setTimeout(() => {
-            if (!userInteracted && !isOpen) {
-                openModal();
-                // Auto-close after 8 seconds
-                setTimeout(() => {
-                    if (isOpen) closeModal();
-                }, 8000);
-            }
-        }, autoShowDelay);
-
-        console.log('✅ Enhanced CTA popup initialized');
-    }
-
-    // Helper method to reset modal state
-    resetModalState(openBtn, modal) {
-        openBtn.style.display = 'flex';
-        openBtn.style.visibility = 'visible';
-        openBtn.style.pointerEvents = 'auto';
-        
-        modal.style.display = 'none';
-        modal.style.visibility = 'hidden';
-        modal.style.pointerEvents = 'none';
-        modal.style.opacity = '0';
-        modal.classList.remove('visible');
+        console.log('✅ CTA popup initialized');
     }
 
     // === SCROLL EFFECTS ===
