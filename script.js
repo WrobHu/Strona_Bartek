@@ -34,24 +34,55 @@ class ModernApp {
             this.initializeSmoothScroll();
             this.initializeMouseGradient();
             this.initializeFloatingWords();
-            
-            // Test popup elements
-            const popup = document.getElementById('cta-popup');
-            const openBtn = document.getElementById('cta-open-btn');
-            const modal = document.querySelector('.cta-modal');
-            
-            console.log('🔍 Popup elements check:', {
-                popup: !!popup,
-                openBtn: !!openBtn,
-                modal: !!modal,
-                isMobile: window.innerWidth <= 768
-            });
+            this.preventZoom();
             
             this.isInitialized = true;
             console.log('✅ App initialized successfully');
         } catch (error) {
             console.error('❌ App initialization failed:', error);
         }
+    }
+
+    // === BLOKADA ZOOMOWANIA ===
+    preventZoom() {
+        // Blokada pinch-to-zoom
+        document.addEventListener('gesturestart', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('gesturechange', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener('gestureend', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Blokada double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        // Blokada wheel zoom
+        document.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Blokada keyboard zoom
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '0')) {
+                e.preventDefault();
+            }
+        });
+
+        console.log('🔒 Zoom prevention initialized');
     }
 
     // === HEADER SCROLL ===
@@ -164,7 +195,6 @@ class ModernApp {
             mainError: document.getElementById('form-main-error'),
             phoneInput: document.getElementById('phone'),
             messageInput: document.getElementById('message'),
-            levelSlider: document.getElementById('level'),
             formContainer: document.querySelector('.form-container')
         };
 
@@ -174,34 +204,6 @@ class ModernApp {
                 let value = e.target.value.replace(/\D/g, '').substring(0, 9);
                 e.target.value = value.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
             });
-        }
-
-        // Slider poziomów
-        if (elements.levelSlider) {
-            const levelDisplay = document.getElementById('level-display');
-            if (levelDisplay) {
-                const updateLevelDisplay = () => {
-                    const value = elements.levelSlider.value;
-                    levelDisplay.textContent = value;
-                    
-                    // Dodaj kolory w zależności od poziomu
-                    const container = elements.levelSlider.closest('.level-slider-container');
-                    if (container) {
-                        container.classList.remove('level-low', 'level-medium', 'level-high');
-                        
-                        if (value <= 3) {
-                            container.classList.add('level-low');
-                        } else if (value <= 7) {
-                            container.classList.add('level-medium');
-                        } else {
-                            container.classList.add('level-high');
-                        }
-                    }
-                };
-                
-                elements.levelSlider.addEventListener('input', updateLevelDisplay);
-                updateLevelDisplay(); // Initialize
-            }
         }
 
         // Real-time validation
@@ -324,14 +326,10 @@ class ModernApp {
                 isValid = false;
                 message = 'Numer telefonu musi mieć co najmniej 9 cyfr.';
             }
-        } else if (field.type === 'range') {
-            // Slider poziomów jest zawsze poprawny
-            isValid = true;
         }
 
         // Dodaj klasy CSS
         if (isValid && value) {
-            // Pole message (opcjonalne) dostaje klasę valid tylko gdy ma treść
             if (field.id === 'message') {
                 if (value.length > 0) {
                     field.classList.add('valid');
@@ -497,12 +495,11 @@ class ModernApp {
                 successState.classList.add('visible');
             });
             
-            // SCROLL DO GÓRY PO WYSŁANIU - NOWA FUNKCJA
+            // SCROLL DO GÓRY PO WYSŁANIU
             setTimeout(() => {
-                // Scroll do początku success state z małym offsetem
                 const formSection = document.querySelector('.form-section');
                 if (formSection) {
-                    const offsetTop = formSection.offsetTop - 100; // 100px offset od góry
+                    const offsetTop = formSection.offsetTop - 100;
                     window.scrollTo({
                         top: offsetTop,
                         behavior: 'smooth'
@@ -538,7 +535,7 @@ class ModernApp {
         }
     }
 
-    // === CTA POPUP - PROSTSZE I DZIAŁAJĄCE ===
+    // === CTA POPUP - NAPRAWIONE DLA MOBILE ===
     initializeCTAPopup() {
         const popup = document.getElementById('cta-popup');
         if (!popup) return;
@@ -553,62 +550,120 @@ class ModernApp {
         }
 
         let isOpen = false;
+        let isAnimating = false;
 
-        // Initial state
+        // Initial state - NAPRAWIONE
         openBtn.style.display = 'flex';
+        openBtn.style.opacity = '1';
+        openBtn.style.visibility = 'visible';
         modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
 
         const openModal = () => {
-            if (isOpen) return;
+            if (isOpen || isAnimating) return;
             
-            console.log('Opening CTA modal');
+            console.log('🔄 Opening CTA modal');
             isOpen = true;
+            isAnimating = true;
             
-            openBtn.style.display = 'none';
-            modal.style.display = 'block';
+            // Hide open button
+            openBtn.style.opacity = '0';
+            openBtn.style.transform = 'scale(0.8)';
             
             setTimeout(() => {
-                modal.classList.add('visible');
-            }, 10);
+                openBtn.style.display = 'none';
+                
+                // Show modal
+                modal.style.display = 'block';
+                modal.style.opacity = '0';
+                modal.style.visibility = 'visible';
+                modal.style.transform = 'scale(0.8) translateY(10px)';
+                
+                // Animate in
+                requestAnimationFrame(() => {
+                    modal.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    modal.style.opacity = '1';
+                    modal.style.transform = 'scale(1) translateY(0)';
+                    modal.classList.add('visible');
+                    
+                    setTimeout(() => {
+                        isAnimating = false;
+                    }, 300);
+                });
+            }, 150);
 
+            // Haptic feedback on mobile
             if ('vibrate' in navigator) {
                 navigator.vibrate(50);
             }
         };
 
         const closeModal = () => {
-            if (!isOpen) return;
+            if (!isOpen || isAnimating) return;
             
-            console.log('Closing CTA modal');
+            console.log('🔄 Closing CTA modal');
             isOpen = false;
+            isAnimating = true;
             
+            // Animate out
+            modal.style.transition = 'all 0.25s ease-out';
+            modal.style.opacity = '0';
+            modal.style.transform = 'scale(0.9) translateY(5px)';
             modal.classList.remove('visible');
             
             setTimeout(() => {
                 modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+                
+                // Show open button
                 openBtn.style.display = 'flex';
-            }, 300);
+                openBtn.style.opacity = '0';
+                openBtn.style.transform = 'scale(0.8)';
+                
+                requestAnimationFrame(() => {
+                    openBtn.style.transition = 'all 0.3s ease-out';
+                    openBtn.style.opacity = '1';
+                    openBtn.style.transform = 'scale(1)';
+                    
+                    setTimeout(() => {
+                        isAnimating = false;
+                    }, 300);
+                });
+            }, 250);
         };
 
-        // Simple event listeners
+        // Event listeners z improved touch handling
         openBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('CTA open button clicked');
+            console.log('🔘 CTA open button clicked');
             openModal();
         });
+
+        // Touch events for better mobile experience
+        openBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            openBtn.style.transform = 'scale(0.95)';
+        }, { passive: false });
+
+        openBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            openBtn.style.transform = 'scale(1)';
+            openModal();
+        }, { passive: false });
         
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('CTA close button clicked');
+            console.log('❌ CTA close button clicked');
             closeModal();
         });
         
-        // Close on outside click
+        // Close on outside click - IMPROVED
         document.addEventListener('click', (e) => {
             if (isOpen && !modal.contains(e.target) && !openBtn.contains(e.target)) {
-                console.log('Closing CTA modal - outside click');
+                console.log('🔄 Closing CTA modal - outside click');
                 closeModal();
             }
         });
@@ -616,18 +671,30 @@ class ModernApp {
         // Close on link click
         modal.addEventListener('click', (e) => {
             if (e.target.tagName === 'A') {
-                console.log('Closing CTA modal - link clicked');
-                closeModal();
+                console.log('🔗 Closing CTA modal - link clicked');
+                setTimeout(closeModal, 100); // Small delay for better UX
             }
         });
 
         // Close on escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && isOpen) {
-                console.log('Closing CTA modal - escape key');
+                console.log('⌨️ Closing CTA modal - escape key');
                 closeModal();
             }
         });
+
+        // Close on scroll (mobile UX improvement)
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            if (isOpen && window.innerWidth <= 768) {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    console.log('📱 Closing CTA modal - scroll on mobile');
+                    closeModal();
+                }, 150);
+            }
+        }, { passive: true });
 
         console.log('✅ CTA popup initialized');
     }
@@ -742,6 +809,49 @@ class ModernApp {
         console.log('✅ Floating words initialized');
     }
 
+    // === MOBILE OPTIMIZATIONS ===
+    initializeMobileOptimizations() {
+        if (window.innerWidth <= 768) {
+            // Disable hover effects on mobile
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @media (hover: none) and (pointer: coarse) {
+                    .feature-item:hover,
+                    .pricing-card:hover,
+                    .testimonial-card:hover,
+                    .offer-category:hover {
+                        transform: none !important;
+                        box-shadow: var(--shadow-subtle) !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Optimize scroll performance
+            document.addEventListener('touchstart', () => {}, { passive: true });
+            document.addEventListener('touchmove', () => {}, { passive: true });
+            
+            console.log('📱 Mobile optimizations applied');
+        }
+    }
+
+    // === PERFORMANCE MONITORING ===
+    initializePerformanceMonitoring() {
+        if ('performance' in window) {
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    const perfData = performance.getEntriesByType('navigation')[0];
+                    const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
+                    console.log(`⚡ Page load time: ${loadTime}ms`);
+                    
+                    if (loadTime > 3000) {
+                        console.warn('⚠️ Slow page load detected');
+                    }
+                }, 0);
+            });
+        }
+    }
+
     // === CLEANUP ===
     destroy() {
         this.observers.forEach(observer => {
@@ -814,14 +924,66 @@ const injectAnimations = () => {
             0% { left: -100%; }
             100% { left: 100%; }
         }
+
+        /* Mobile popup animations */
+        @media (max-width: 768px) {
+            .cta-modal {
+                transform-origin: bottom center !important;
+            }
+            
+            .cta-modal.visible {
+                animation: slideUpMobile 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+            }
+        }
+
+        @keyframes slideUpMobile {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
     `;
     
     document.head.appendChild(style);
 };
 
+// === VIEWPORT META TAG INJECTION ===
+const injectViewportMeta = () => {
+    let viewportMeta = document.querySelector('meta[name="viewport"]');
+    
+    if (!viewportMeta) {
+        viewportMeta = document.createElement('meta');
+        viewportMeta.name = 'viewport';
+        document.head.appendChild(viewportMeta);
+    }
+    
+    // NAPRAWIONA BLOKADA ZOOMOWANIA
+    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+};
+
 // === INITIALIZATION ===
+injectViewportMeta();
 injectAnimations();
+
+// Initialize app
 const app = new ModernApp();
 window.app = app;
+
+// Performance monitoring
+if ('performance' in window) {
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+                const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
+                console.log(`⚡ Total load time: ${loadTime}ms`);
+            }
+        }, 0);
+    });
+}
 
 console.log('🎯 App loaded successfully');
