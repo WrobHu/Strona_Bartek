@@ -294,23 +294,191 @@
   }
 }
 
-/* Better scrollbar on desktop */
-@media (min-width: 769px) {
-  ::-webkit-scrollbar {
-    width: 8px;
+/* ANIMACJE MOBILE - ULEPSZONE I PŁYNNE */
+@media (max-width: 768px) {
+  /* Szybsze animacje na mobile */
+  * {
+    transition-duration: 0.2s !important;
   }
   
-  ::-webkit-scrollbar-track {
-    background: var(--color-surface);
+  .btn-primary,
+  .btn-secondary,
+  .btn-cta,
+  .btn-card,
+  .btn-submit {
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    min-height: 48px;
+    font-size: 0.95rem;
   }
   
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-accent);
-    border-radius: 4px;
+  .btn-primary:active,
+  .btn-secondary:active,
+  .btn-cta:active,
+  .btn-card:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
   }
   
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-accent-hover);
+  /* Form animations */
+  .form-group {
+    transition: transform 0.2s ease;
+  }
+  
+  .form-group.focused {
+    transform: translateY(-1px);
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    transition: all 0.2s ease;
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    transform: none; /* Usuń transform na mobile */
+  }
+  
+  /* Feature items animations */
+  .feature-item {
+    transition: all 0.2s ease;
+  }
+  
+  .feature-item:active {
+    transform: scale(0.98);
+  }
+  
+  /* Testimonial cards */
+  .testimonial-card {
+    transition: all 0.2s ease;
+  }
+  
+  .testimonial-card:active {
+    transform: scale(0.98);
+  }
+  
+  /* Pricing cards */
+  .pricing-card {
+    transition: all 0.2s ease;
+  }
+  
+  .pricing-card:active {
+    transform: scale(0.98);
+  }
+  
+  /* Hamburger menu animation */
+  .hamburger-line {
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  /* Navigation animations */
+  .main-nav.mobile-active {
+    animation: slideDown 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  /* Success state animations na mobile */
+  .form-success-state.visible {
+    animation: successSlideIn 0.5s ease-out;
+  }
+  
+  .success-checkmark {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .checkmark {
+    width: 60px;
+    height: 60px;
+  }
+  
+  /* Reveal animations - szybsze na mobile */
+  .reveal-element {
+    animation: fadeIn 0.4s ease-out !important;
+  }
+  
+  /* CTA Open Button - ulepszona animacja */
+  .cta-open-btn {
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .cta-open-btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* PERFORMANCE OPTIMIZATIONS */
+@media (max-width: 768px) {
+  /* Wyłącz ciężkie animacje na słabszych urządzeniach */
+  .floating-words-background {
+    display: none !important;
+  }
+  
+  .mouse-gradient-background {
+    display: none !important;
+  }
+  
+  /* Zmniejsz blur effects */
+  .main-header {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Prostsze cienie */
+  .feature-item,
+  .pricing-card,
+  .testimonial-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  .feature-item:hover,
+  .pricing-card:hover,
+  .testimonial-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+    transform: none !important; /* Usuń hover transform na mobile */
+  }
+}
+
+/* BETTER TOUCH TARGETS */
+@media (hover: none) and (pointer: coarse) {
+  .cta-close-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.2rem;
+    top: 0.3rem;
+    right: 0.3rem;
+  }
+  
+  .cta-link,
+  .cta-main-link {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Better button spacing */
+  .hero-actions {
+    gap: 1rem;
+  }
+  
+  .hero-actions .btn-primary,
+  .hero-actions .btn-secondary {
+    padding: 1rem 1.5rem;
+    min-height: 48px;
+  }
+}
+
+/* REDUCED MOTION PREFERENCES */
+@media (prefers-reduced-motion: reduce) {
+  .cta-open-btn {
+    animation: none !important;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }
 
