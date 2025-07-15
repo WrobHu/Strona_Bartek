@@ -222,7 +222,61 @@ class ModernApp {
             });
         }
 
-        // Form submission
+        // Enhanced form UX improvements
+        const addUXEnhancements = () => {
+            // Smooth focus transitions
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', () => {
+                    input.parentElement.classList.remove('focused');
+                });
+            });
+
+            // Real-time character count for textarea
+            if (elements.messageInput) {
+                const charCountDisplay = document.createElement('div');
+                charCountDisplay.className = 'char-count';
+                charCountDisplay.style.cssText = `
+                    font-size: 0.8rem;
+                    color: var(--color-text-muted);
+                    text-align: right;
+                    margin-top: 0.5rem;
+                `;
+                elements.messageInput.parentElement.appendChild(charCountDisplay);
+                
+                elements.messageInput.addEventListener('input', () => {
+                    const length = elements.messageInput.value.length;
+                    charCountDisplay.textContent = `${length} znaków`;
+                    
+                    if (length > 500) {
+                        charCountDisplay.style.color = 'var(--color-warning)';
+                    } else {
+                        charCountDisplay.style.color = 'var(--color-text-muted)';
+                    }
+                });
+            }
+
+            // Enhanced phone input formatting
+            if (elements.phoneInput) {
+                elements.phoneInput.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/\D/g, '').substring(0, 9);
+                    e.target.value = value.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+                    
+                    // Visual feedback for valid length
+                    if (value.length === 9) {
+                        e.target.classList.add('valid');
+                        e.target.classList.remove('error');
+                    }
+                });
+            }
+        };
+
+        addUXEnhancements();
+
+        // Form submission - na końcu
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!this.formState.isSubmitting) {
@@ -430,13 +484,18 @@ class ModernApp {
                 successState.classList.add('visible');
             });
             
-            // Scroll to success message
+            // SCROLL DO GÓRY PO WYSŁANIU - NOWA FUNKCJA
             setTimeout(() => {
-                successState.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
-                });
-            }, 500);
+                // Scroll do początku success state z małym offsetem
+                const formSection = document.querySelector('.form-section');
+                if (formSection) {
+                    const offsetTop = formSection.offsetTop - 100; // 100px offset od góry
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 300);
             
         }, 600);
     }
@@ -466,7 +525,7 @@ class ModernApp {
         }
     }
 
-    // === CTA POPUP - NAPRAWIONE ===
+    // === CTA POPUP - ULEPSZONE ===
     initializeCTAPopup() {
         const popup = document.getElementById('cta-popup');
         if (!popup) return;
@@ -482,25 +541,37 @@ class ModernApp {
         // Ensure initial state
         openBtn.style.display = 'flex';
         modal.style.display = 'none';
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.8)';
 
         const openModal = () => {
             if (isOpen) return;
             isOpen = true;
             
+            // Hide button
             openBtn.style.display = 'none';
-            modal.style.display = 'block';
             
-            setTimeout(() => {
+            // Show modal
+            modal.style.display = 'block';
+            modal.classList.add('visible');
+            
+            // Animate in
+            requestAnimationFrame(() => {
                 modal.style.opacity = '1';
                 modal.style.transform = 'scale(1)';
-                modal.classList.add('visible');
-            }, 10);
+            });
+
+            // Vibration feedback on mobile
+            if ('vibrate' in navigator) {
+                navigator.vibrate(50);
+            }
         };
 
         const closeModal = () => {
             if (!isOpen) return;
             isOpen = false;
             
+            // Animate out
             modal.style.opacity = '0';
             modal.style.transform = 'scale(0.8)';
             modal.classList.remove('visible');
@@ -511,6 +582,7 @@ class ModernApp {
             }, 300);
         };
 
+        // Event listeners
         openBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -523,25 +595,55 @@ class ModernApp {
             closeModal();
         });
         
+        // Close on background click
         popup.addEventListener('click', (e) => {
-            if (e.target === popup) {
+            if (e.target === popup && isOpen) {
                 closeModal();
             }
         });
 
+        // Close on link click
         modal.addEventListener('click', (e) => {
             if (e.target.tagName === 'A') {
                 closeModal();
             }
         });
 
+        // Close on escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && isOpen) {
                 closeModal();
             }
         });
 
-        console.log('✅ CTA popup initialized');
+        // Auto-show logic - pokazuj po 10 sekundach jeśli user nie wchodzi w interakcje
+        let autoShowTimeout;
+        let userInteracted = false;
+
+        const resetAutoShow = () => {
+            userInteracted = true;
+            if (autoShowTimeout) {
+                clearTimeout(autoShowTimeout);
+            }
+        };
+
+        // Track user interactions
+        ['click', 'scroll', 'touchstart', 'keydown'].forEach(event => {
+            document.addEventListener(event, resetAutoShow, { once: true, passive: true });
+        });
+
+        // Auto-show after 10 seconds if no interaction
+        autoShowTimeout = setTimeout(() => {
+            if (!userInteracted && !isOpen) {
+                openModal();
+                // Auto-close after 8 seconds
+                setTimeout(() => {
+                    if (isOpen) closeModal();
+                }, 8000);
+            }
+        }, 10000);
+
+        console.log('✅ Enhanced CTA popup initialized');
     }
 
     // === SCROLL EFFECTS ===
