@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>O mnie - Bartłomiej Płóciennik</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +58,21 @@
                 </div>
             </div>
             <div class="about-me-image-wrapper reveal-element">
-                <img class="image-parallax" src="https://images.unsplash.com/photo-1583394833446-ac86a0327113?q=80&w=1887&auto=format&fit=crop" alt="Zdjęcie Bartłomieja Płóciennika" loading="lazy">
+                <!-- TWOJE ZDJĘCIE PROFILOWE -->
+                <picture class="profile-picture">
+                    <!-- WebP format (już masz) -->
+                    <source srcset="DSC_4285CV.webp" type="image/webp">
+                    
+                    <!-- Fallback JPEG (jeśli chcesz dodać dla starszych przeglądarek) -->
+                    <img 
+                        src="DSC_4285CV.jpg" 
+                        alt="Bartłomiej Płóciennik - nauczyciel języków angielskiego i francuskiego" 
+                        loading="lazy"
+                        class="profile-image"
+                        width="400"
+                        height="500"
+                    >
+                </picture>
             </div>
         </section>
 
