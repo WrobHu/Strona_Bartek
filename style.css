@@ -776,6 +776,16 @@ main {
   visibility: visible;
   box-shadow: var(--shadow-medium);
   transition: all var(--transition-slow);
+  background: var(--color-surface);
+  aspect-ratio: 4/5;
+  /* NAPRAWKA - większe zdjęcie */
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.about-me-image-wrapper:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-strong);
 }
 
 .about-me-image-wrapper:hover {
@@ -809,6 +819,11 @@ main {
   opacity: 1;
   visibility: visible;
   box-shadow: var(--shadow-subtle);
+  /* NAPRAWKA - flexbox dla równych wysokości */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 450px; /* Minimalna wysokość dla spójności */
 }
 
 .offer-category:hover {
@@ -834,6 +849,8 @@ main {
   list-style: none;
   padding: 0;
   margin-bottom: 1.5rem;
+  /* NAPRAWKA - flex grow dla wypełnienia przestrzeni */
+  flex-grow: 1;
 }
 
 .offer-category li {
@@ -842,6 +859,7 @@ main {
   position: relative;
   padding-left: 1.8rem;
   font-weight: 300;
+  line-height: 1.5;
 }
 
 .offer-category li::before {
@@ -858,6 +876,13 @@ main {
   align-items: center;
   justify-content: center;
   font-size: 0.8rem;
+  top: 0.6rem;
+}
+
+/* NAPRAWKA - przycisk zawsze na dole */
+.offer-category .btn-card {
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 /* Pricing */
@@ -3084,7 +3109,8 @@ main {
   transition: all var(--transition-slow);
   background: var(--color-surface);
   aspect-ratio: 4/5; /* Dostosowane do proporcji Twojego zdjęcia */
-  max-width: 350px;
+  /* NAPRAWKA - większe zdjęcie */
+  max-width: 420px;
   margin: 0 auto;
 }
 
@@ -3175,7 +3201,8 @@ main {
   }
   
   .about-me-image-wrapper {
-    max-width: 280px;
+    /* NAPRAWKA - większe zdjęcie na mobile */
+    max-width: 320px;
     margin: 0 auto 2rem;
     order: -1; /* Move image to top on mobile */
   }
@@ -3188,16 +3215,35 @@ main {
     text-align: center;
     margin-bottom: 1.5rem;
   }
+  
+  /* NAPRAWKA - kwalifikacje pod opisem na mobile */
+  .about-me-text .qualifications {
+    order: 1;
+    margin-top: 2rem;
+  }
+  
+  .offer-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .offer-category {
+    min-height: auto;
+  }
 }
 
 @media (max-width: 480px) {
   .about-me-image-wrapper {
-    max-width: 240px;
+    /* NAPRAWKA - większe zdjęcie na małym mobile */
+    max-width: 280px;
     aspect-ratio: 3/4;
   }
   
   .profile-image {
     object-position: center top; /* Fokus na górnej części na małych ekranach */
+  }
+  
+  .offer-category {
+    padding: 1.2rem;
   }
 }
 
