@@ -34,6 +34,7 @@ class ModernApp {
             this.initializeSmoothScroll();
             this.initializeMouseGradient();
             this.initializeFloatingWords();
+            this.initializeMobileOptimizations(); // NAPRAWKA - dodaj mobile optimizations
             this.preventZoom();
             
             this.isInitialized = true;
@@ -770,14 +771,25 @@ class ModernApp {
         console.log('✅ Scroll effects initialized');
     }
 
-    // === SMOOTH SCROLL ===
+    // === SMOOTH SCROLL - ULEPSZONE DLA MOBILE ===
     initializeSmoothScroll() {
+        // NAPRAWKA - wyłącz smooth scroll na mobile dla lepszej wydajności
+        if (window.innerWidth <= 768) {
+            console.log('📱 Smooth scroll disabled on mobile for better performance');
+            return;
+        }
+        
         if (typeof Lenis !== 'undefined') {
             try {
                 const lenis = new Lenis({
                     duration: 1.2,
                     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                    smooth: true
+                    smooth: true,
+                    // NAPRAWKA - lepsze ustawienia dla desktop
+                    direction: 'vertical',
+                    gestureDirection: 'vertical',
+                    smoothWheel: true,
+                    smoothTouch: false, // Wyłącz na touch dla lepszej wydajności
                 });
 
                 const raf = (time) => {
@@ -786,7 +798,16 @@ class ModernApp {
                 };
                 
                 requestAnimationFrame(raf);
-                console.log('✅ Smooth scroll initialized');
+                
+                // NAPRAWKA - wyłącz przy resize do mobile
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth <= 768) {
+                        lenis.destroy();
+                        console.log('📱 Smooth scroll disabled - mobile detected');
+                    }
+                }, { passive: true });
+                
+                console.log('✅ Smooth scroll initialized (desktop only)');
             } catch (error) {
                 console.warn('Smooth scroll failed:', error);
             }
@@ -848,7 +869,7 @@ class ModernApp {
         console.log('✅ Floating words initialized');
     }
 
-    // === MOBILE OPTIMIZATIONS ===
+    // === MOBILE OPTIMIZATIONS - ULEPSZONE ===
     initializeMobileOptimizations() {
         if (window.innerWidth <= 768) {
             // Disable hover effects on mobile
@@ -866,11 +887,49 @@ class ModernApp {
             `;
             document.head.appendChild(style);
 
-            // Optimize scroll performance
+            // NAPRAWKA - optimize scroll performance na mobile
             document.addEventListener('touchstart', () => {}, { passive: true });
             document.addEventListener('touchmove', () => {}, { passive: true });
             
-            console.log('📱 Mobile optimizations applied');
+            // NAPRAWKA - lepsze zarządzanie scroll na mobile
+            document.body.style.overscrollBehaviorY = 'contain';
+            document.documentElement.style.overscrollBehaviorY = 'contain';
+            
+            // NAPRAWKA - wyłącz animacje przy szybkim scrollu
+            let scrollTimeout;
+            let isScrolling = false;
+            
+            window.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    // Zmniejsz animacje podczas scrollowania
+                    document.body.classList.add('is-scrolling');
+                    isScrolling = true;
+                }
+                
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    document.body.classList.remove('is-scrolling');
+                    isScrolling = false;
+                }, 150);
+            }, { passive: true });
+            
+            // Dodaj style dla scrollowania
+            const scrollStyle = document.createElement('style');
+            scrollStyle.innerHTML = `
+                @media (max-width: 768px) {
+                    .is-scrolling * {
+                        animation-duration: 0.01ms !important;
+                        transition-duration: 0.1s !important;
+                    }
+                    
+                    .is-scrolling .reveal-element {
+                        animation: none !important;
+                    }
+                }
+            `;
+            document.head.appendChild(scrollStyle);
+            
+            console.log('📱 Enhanced mobile optimizations applied');
         }
     }
 
