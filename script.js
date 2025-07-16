@@ -1,4 +1,4 @@
-// === NAPRAWIONA APLIKACJA - BARTŁOMIEJ PŁÓCIENNIK ===
+// === NAPRAWIONA APLIKACJA - BARTŁOMIEJ PŁÓCIENNIK Z EMAILJS ===
 
 class ModernApp {
     constructor() {
@@ -8,6 +8,348 @@ class ModernApp {
             isSubmitting: false,
             validationEnabled: false
         };
+        
+        // === SCROLL EFFECTS ===
+    initializeScrollEffects() {
+        if (!('IntersectionObserver' in window)) {
+            console.warn('IntersectionObserver not supported');
+            return;
+        }
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const element = entry.target;
+                    element.style.animation = 'fadeIn 0.6s ease-out forwards';
+                    element.classList.add('revealed');
+                    revealObserver.unobserve(element);
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        const revealElements = document.querySelectorAll('.reveal-element, .feature-item, .pricing-card, .testimonial-card');
+        revealElements.forEach(element => {
+            element.style.opacity = '1';
+            element.style.visibility = 'visible';
+            revealObserver.observe(element);
+        });
+
+        this.observers.set('reveal', revealObserver);
+        console.log('✅ Scroll effects initialized');
+    }
+
+    // === SMOOTH SCROLL - ULEPSZONE DLA MOBILE ===
+    initializeSmoothScroll() {
+        if (window.innerWidth <= 768) {
+            console.log('📱 Smooth scroll disabled on mobile for better performance');
+            return;
+        }
+        
+        if (typeof Lenis !== 'undefined') {
+            try {
+                const lenis = new Lenis({
+                    duration: 1.2,
+                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                    smooth: true,
+                    direction: 'vertical',
+                    gestureDirection: 'vertical',
+                    smoothWheel: true,
+                    smoothTouch: false,
+                });
+
+                const raf = (time) => {
+                    lenis.raf(time);
+                    requestAnimationFrame(raf);
+                };
+                
+                requestAnimationFrame(raf);
+                
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth <= 768) {
+                        lenis.destroy();
+                        console.log('📱 Smooth scroll disabled - mobile detected');
+                    }
+                }, { passive: true });
+                
+                console.log('✅ Smooth scroll initialized (desktop only)');
+            } catch (error) {
+                console.warn('Smooth scroll failed:', error);
+            }
+        }
+    }
+
+    // === MOUSE GRADIENT ===
+    initializeMouseGradient() {
+        const gradient = document.querySelector('.mouse-gradient-background');
+        if (!gradient || window.innerWidth <= 768) return;
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let isMoving = false;
+
+        const updateGradient = () => {
+            gradient.style.transform = `translate(${mouseX - 200}px, ${mouseY - 200}px)`;
+            isMoving = false;
+        };
+
+        const handleMouseMove = (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            if (!isMoving) {
+                requestAnimationFrame(updateGradient);
+                isMoving = true;
+            }
+        };
+
+        document.addEventListener('mousemove', handleMouseMove, { passive: true });
+        console.log('✅ Mouse gradient initialized');
+    }
+
+    // === FLOATING WORDS ===
+    initializeFloatingWords() {
+        const container = document.getElementById('floating-words-container');
+        if (!container || window.innerWidth <= 768) return;
+
+        const words = [
+            'Hello', 'Bonjour', 'Płynność', 'Fluency', 'Grammar', 'Conversation', 
+            'Cześć', 'Apprendre', 'Learn', 'Merci', 'Thanks', 'Język'
+        ];
+        
+        const wordCount = Math.min(15, Math.floor(window.innerWidth / 100));
+        
+        for (let i = 0; i < wordCount; i++) {
+            const word = document.createElement('span');
+            word.className = 'floating-word';
+            word.textContent = words[i % words.length];
+            word.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+            word.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+            word.style.opacity = Math.random() * 0.08 + 0.02;
+            word.style.animationDelay = Math.random() * 8 + 's';
+            
+            container.appendChild(word);
+        }
+        
+        console.log('✅ Floating words initialized');
+    }
+
+    // === MOBILE OPTIMIZATIONS - ULEPSZONE ===
+    initializeMobileOptimizations() {
+        if (window.innerWidth <= 768) {
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @media (hover: none) and (pointer: coarse) {
+                    .feature-item:hover,
+                    .pricing-card:hover,
+                    .testimonial-card:hover,
+                    .offer-category:hover {
+                        transform: none !important;
+                        box-shadow: var(--shadow-subtle) !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.addEventListener('touchstart', () => {}, { passive: true });
+            document.addEventListener('touchmove', () => {}, { passive: true });
+            
+            document.body.style.overscrollBehaviorY = 'contain';
+            document.documentElement.style.overscrollBehaviorY = 'contain';
+            
+            let scrollTimeout;
+            let isScrolling = false;
+            
+            window.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    document.body.classList.add('is-scrolling');
+                    isScrolling = true;
+                }
+                
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    document.body.classList.remove('is-scrolling');
+                    isScrolling = false;
+                }, 150);
+            }, { passive: true });
+            
+            const scrollStyle = document.createElement('style');
+            scrollStyle.innerHTML = `
+                @media (max-width: 768px) {
+                    .is-scrolling * {
+                        animation-duration: 0.01ms !important;
+                        transition-duration: 0.1s !important;
+                    }
+                    
+                    .is-scrolling .reveal-element {
+                        animation: none !important;
+                    }
+                }
+            `;
+            document.head.appendChild(scrollStyle);
+            
+            console.log('📱 Enhanced mobile optimizations applied');
+        }
+    }
+
+    // === CLEANUP ===
+    destroy() {
+        this.observers.forEach(observer => {
+            observer.disconnect();
+        });
+        this.observers.clear();
+        console.log('✅ App cleaned up');
+    }
+}
+
+const injectAnimations = () => {
+    if (document.getElementById('app-animations')) return;
+
+    const style = document.createElement('style');
+    style.id = 'app-animations';
+    style.textContent = `
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .reveal-element {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .revealed {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .cta-modal {
+                transform-origin: bottom center !important;
+            }
+            
+            .cta-modal.visible {
+                animation: slideUpMobile 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+            }
+        }
+
+        @keyframes slideUpMobile {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    `;
+    
+    document.head.appendChild(style);
+};
+
+// === VIEWPORT META TAG INJECTION ===
+const injectViewportMeta = () => {
+    let viewportMeta = document.querySelector('meta[name="viewport"]');
+    
+    if (!viewportMeta) {
+        viewportMeta = document.createElement('meta');
+        viewportMeta.name = 'viewport';
+        document.head.appendChild(viewportMeta);
+    }
+    
+    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+};
+
+// === INITIALIZATION ===
+injectViewportMeta();
+injectAnimations();
+
+// Initialize app
+const app = new ModernApp();
+window.app = app;
+
+// === GLOBALNE FUNKCJE TESTOWE DLA EMAILJS ===
+window.testEmail = () => {
+    console.log('🧪 Testing EmailJS configuration...');
+    return app.testEmailConfig();
+};
+
+window.showEmailConfig = () => {
+    console.log('📧 Current EmailJS Configuration:');
+    console.log('Public Key:', app.emailConfig.publicKey);
+    console.log('Service ID:', app.emailConfig.serviceId);
+    console.log('Notification Template:', app.emailConfig.notificationTemplate);
+    console.log('Thank You Template:', app.emailConfig.thankyouTemplate);
+    console.log('EmailJS Available:', typeof emailjs !== 'undefined');
+};
+
+// Performance monitoring
+if ('performance' in window) {
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+                const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
+                console.log(`⚡ Total load time: ${loadTime}ms`);
+            }
+        }, 0);
+    });
+}
+
+console.log('🎯 App with EmailJS loaded successfully');
+console.log('📧 Use testEmail() to test configuration');
+console.log('⚙️ Use showEmailConfig() to check settings'); EMAILJS CONFIGURATION ===
+        this.emailConfig = {
+            publicKey: '9TmBbr71TT08YFetK',              // Twój Public Key
+            serviceId: 'YOUR_SERVICE_ID',                 // ZAMIEŃ NA SWÓJ SERVICE ID
+            notificationTemplate: 'template_notification', // ZAMIEŃ NA ID TEMPLATE DLA CIEBIE
+            thankyouTemplate: 'template_thankyou'         // ZAMIEŃ NA ID TEMPLATE DLA KLIENTA
+        };
+        
         this.init();
     }
 
@@ -26,6 +368,14 @@ class ModernApp {
         console.log('🚀 Initializing app...');
         
         try {
+            // Initialize EmailJS
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init(this.emailConfig.publicKey);
+                console.log('📧 EmailJS initialized with key:', this.emailConfig.publicKey);
+            } else {
+                console.warn('⚠️ EmailJS not loaded! Add SDK to HTML.');
+            }
+            
             this.initializeHeader();
             this.initializeMobileMenu();
             this.initializeForm();
@@ -34,7 +384,7 @@ class ModernApp {
             this.initializeSmoothScroll();
             this.initializeMouseGradient();
             this.initializeFloatingWords();
-            this.initializeMobileOptimizations(); // NAPRAWKA - dodaj mobile optimizations
+            this.initializeMobileOptimizations();
             this.preventZoom();
             
             this.isInitialized = true;
@@ -182,12 +532,12 @@ class ModernApp {
         console.log('✅ Mobile menu initialized');
     }
 
-    // === FORMULARZ - NAPRAWIONY ===
+    // === FORMULARZ - Z EMAILJS ===
     initializeForm() {
         const form = document.getElementById('contact-form');
         if (!form) return;
 
-        console.log('✅ Initializing form...');
+        console.log('✅ Initializing form with EmailJS...');
 
         const elements = {
             form,
@@ -226,7 +576,7 @@ class ModernApp {
             });
         });
 
-        // Obsługa textarea message - walidacja dopiero gdy ma treść
+        // Obsługa textarea message
         if (elements.messageInput) {
             elements.messageInput.addEventListener('input', () => {
                 if (elements.messageInput.value.trim().length > 0) {
@@ -240,7 +590,6 @@ class ModernApp {
 
         // Enhanced form UX improvements
         const addUXEnhancements = () => {
-            // Smooth focus transitions
             inputs.forEach(input => {
                 input.addEventListener('focus', () => {
                     input.parentElement.classList.add('focused');
@@ -251,7 +600,6 @@ class ModernApp {
                 });
             });
 
-            // Real-time character count for textarea
             if (elements.messageInput) {
                 const charCountDisplay = document.createElement('div');
                 charCountDisplay.className = 'char-count';
@@ -275,13 +623,11 @@ class ModernApp {
                 });
             }
 
-            // Enhanced phone input formatting
             if (elements.phoneInput) {
                 elements.phoneInput.addEventListener('input', (e) => {
                     let value = e.target.value.replace(/\D/g, '').substring(0, 9);
                     e.target.value = value.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
                     
-                    // Visual feedback for valid length
                     if (value.length === 9) {
                         e.target.classList.add('valid');
                         e.target.classList.remove('error');
@@ -292,7 +638,7 @@ class ModernApp {
 
         addUXEnhancements();
 
-        // Form submission - na końcu
+        // Form submission - z EmailJS
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!this.formState.isSubmitting) {
@@ -300,7 +646,7 @@ class ModernApp {
             }
         });
 
-        console.log('✅ Form initialized');
+        console.log('✅ Form with EmailJS initialized');
     }
 
     validateField(field) {
@@ -309,7 +655,6 @@ class ModernApp {
         let isValid = true;
         let message = '';
 
-        // Resetuj poprzednie stany
         field.classList.remove('valid', 'error');
 
         if (field.required && !value) {
@@ -329,7 +674,6 @@ class ModernApp {
             }
         }
 
-        // Dodaj klasy CSS
         if (isValid && value) {
             if (field.id === 'message') {
                 if (value.length > 0) {
@@ -342,7 +686,6 @@ class ModernApp {
             field.classList.add('error');
         }
 
-        // Obsługa komunikatów błędów
         if (errorSpan) {
             errorSpan.textContent = message;
             errorSpan.classList.toggle('visible', !isValid && message);
@@ -358,6 +701,7 @@ class ModernApp {
         }
     }
 
+    // === GŁÓWNA FUNKCJA WYSYŁANIA Z EMAILJS ===
     async handleFormSubmit(elements) {
         const { form, submitButton, successState, mainError, formContainer } = elements;
         
@@ -397,22 +741,97 @@ class ModernApp {
         this.setSubmitButtonState(submitButton, true, 'Wysyłanie...');
 
         try {
-            // Collect form data
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            data.timestamp = new Date().toISOString();
+            // Sprawdź czy EmailJS jest dostępny
+            if (typeof emailjs === 'undefined') {
+                throw new Error('EmailJS nie jest załadowany');
+            }
+
+            // Zbierz dane z formularza
+            const formData = {
+                from_name: form.querySelector('#fname').value + ' ' + form.querySelector('#lname').value,
+                from_email: form.querySelector('#email').value,
+                phone: form.querySelector('#phone').value,
+                level: form.querySelector('#level').value,
+                message: form.querySelector('#message').value || 'Brak dodatkowej wiadomości',
+                current_date: new Date().toLocaleString('pl-PL', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
             
-            console.log('📤 Sending form data:', data);
+            console.log('📤 Sending emails with data:', formData);
             
-            // Symulacja wysyłania
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Wysyłaj oba e-maile równolegle
+            const emailPromises = [
+                // Email dla Ciebie (powiadomienie)
+                emailjs.send(
+                    this.emailConfig.serviceId,
+                    this.emailConfig.notificationTemplate,
+                    {
+                        ...formData,
+                        to_email: 'bar.plociennik@gmail.com',
+                        to_name: 'Bartłomiej Płóciennik'
+                    }
+                ),
+                // Email dla klienta (podziękowanie)
+                emailjs.send(
+                    this.emailConfig.serviceId,
+                    this.emailConfig.thankyouTemplate,
+                    {
+                        ...formData,
+                        to_email: formData.from_email,
+                        to_name: formData.from_name
+                    }
+                )
+            ];
+            
+            // Czekaj na oba e-maile
+            const results = await Promise.all(emailPromises);
+            
+            console.log('✅ Notification email sent:', results[0]);
+            console.log('✅ Thank you email sent:', results[1]);
             
             // Show success animation
             this.showFormSuccess(form, successState, formContainer);
             
+            // Optional: Track conversion
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'form_submit', {
+                    'event_category': 'engagement',
+                    'event_label': 'contact_form_success'
+                });
+            }
+            
         } catch (error) {
-            console.error('❌ Form submission failed:', error);
-            this.showMainError(mainError, 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.');
+            console.error('❌ Email sending failed:', error);
+            
+            let errorMessage = 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.';
+            
+            // Detailed error handling
+            if (error.message?.includes('EmailJS')) {
+                errorMessage = 'Problem z usługą email. Spróbuj ponownie za chwilę lub zadzwoń.';
+            } else if (error.status === 422) {
+                errorMessage = 'Błąd walidacji danych. Sprawdź poprawność formularza.';
+            } else if (error.status === 400) {
+                errorMessage = 'Błąd konfiguracji. Skontaktuj się telefonicznie: +48 661 576 007.';
+            } else if (!navigator.onLine) {
+                errorMessage = 'Brak połączenia z internetem. Sprawdź połączenie.';
+            }
+            
+            this.showMainError(mainError, errorMessage);
+            
+            // Optional: Track error
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'form_error', {
+                    'event_category': 'error',
+                    'event_label': 'email_send_failed',
+                    'value': error.status || 0
+                });
+            }
+            
         } finally {
             this.setSubmitButtonState(submitButton, false, 'Wyślij wiadomość');
             this.formState.isSubmitting = false;
@@ -446,10 +865,8 @@ class ModernApp {
     showFormSuccess(form, successState, formContainer) {
         if (!successState || !formContainer) return;
 
-        // Trigger confetti first
         this.triggerConfetti();
 
-        // Hide form with animation
         form.style.transition = 'all 0.6s ease';
         form.style.opacity = '0';
         form.style.transform = 'translateY(-30px) scale(0.95)';
@@ -457,7 +874,6 @@ class ModernApp {
         setTimeout(() => {
             form.style.display = 'none';
             
-            // Create success HTML - NAPRAWIONA STRUKTURA
             successState.innerHTML = `
                 <div class="success-checkmark">
                     <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -469,7 +885,7 @@ class ModernApp {
                 <div class="success-content">
                     <h2>🎉 Dziękuję!</h2>
                     <p class="success-main-text">
-                        Twoja wiadomość została wysłana pomyślnie. Cieszę się, że chcesz rozpocząć naukę języka!
+                        Twoja wiadomość została wysłana pomyślnie! Dostałeś/aś również email z potwierdzeniem.
                     </p>
                     
                     <div class="success-next-steps">
@@ -492,12 +908,10 @@ class ModernApp {
             
             successState.style.display = 'flex';
             
-            // Show success state
             requestAnimationFrame(() => {
                 successState.classList.add('visible');
             });
             
-            // SCROLL DO GÓRY PO WYSŁANIU
             setTimeout(() => {
                 const formSection = document.querySelector('.form-section');
                 if (formSection) {
@@ -537,6 +951,46 @@ class ModernApp {
         }
     }
 
+    // === FUNKCJA TESTOWA EMAILJS ===
+    async testEmailConfig() {
+        try {
+            if (typeof emailjs === 'undefined') {
+                console.error('❌ EmailJS not loaded!');
+                return false;
+            }
+            
+            const testData = {
+                from_name: 'Test User',
+                from_email: 'test@example.com',
+                phone: '123 456 789',
+                level: 'B1 - Średnio-zaawansowany',
+                message: 'To jest wiadomość testowa z formularza kontaktowego.',
+                current_date: new Date().toLocaleString('pl-PL'),
+                to_email: 'bar.plociennik@gmail.com',
+                to_name: 'Bartłomiej Płóciennik'
+            };
+            
+            console.log('🧪 Testing EmailJS configuration...');
+            console.log('Service ID:', this.emailConfig.serviceId);
+            console.log('Template ID:', this.emailConfig.notificationTemplate);
+            console.log('Test data:', testData);
+            
+            const result = await emailjs.send(
+                this.emailConfig.serviceId,
+                this.emailConfig.notificationTemplate,
+                testData
+            );
+            
+            console.log('✅ Test email sent successfully:', result);
+            alert('✅ Test email wysłany pomyślnie! Sprawdź swoją skrzynkę.');
+            return true;
+        } catch (error) {
+            console.error('❌ Test email failed:', error);
+            alert('❌ Test nie powiódł się. Sprawdź konfigurację EmailJS.\n\nBłąd: ' + error.message);
+            return false;
+        }
+    }
+
     // === CTA POPUP - NAPRAWIONE ANIMACJE ===
     initializeCTAPopup() {
         const popup = document.getElementById('cta-popup');
@@ -554,7 +1008,6 @@ class ModernApp {
         let isOpen = false;
         let isAnimating = false;
 
-        // Initial state - NAPRAWIONE
         openBtn.style.display = 'flex';
         openBtn.style.opacity = '1';
         openBtn.style.visibility = 'visible';
@@ -571,7 +1024,6 @@ class ModernApp {
             isOpen = true;
             isAnimating = true;
             
-            // Hide open button NAPRAWKA - jedna animacja
             openBtn.style.transition = 'all 0.2s ease-out';
             openBtn.style.opacity = '0';
             openBtn.style.transform = 'scale(0.8)';
@@ -579,13 +1031,11 @@ class ModernApp {
             setTimeout(() => {
                 openBtn.style.display = 'none';
                 
-                // Show modal NAPRAWKA - prosta animacja
                 modal.style.display = 'block';
                 modal.style.opacity = '0';
                 modal.style.visibility = 'visible';
                 modal.style.transform = 'scale(0.8) translateY(10px)';
                 
-                // Animate in NAPRAWKA - jedna animacja
                 requestAnimationFrame(() => {
                     modal.style.transition = 'all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
                     modal.style.opacity = '1';
@@ -598,7 +1048,6 @@ class ModernApp {
                 });
             }, 200);
 
-            // Haptic feedback on mobile
             if ('vibrate' in navigator) {
                 navigator.vibrate(50);
             }
@@ -611,7 +1060,6 @@ class ModernApp {
             isOpen = false;
             isAnimating = true;
             
-            // Animate out NAPRAWKA - jedna animacja
             modal.style.transition = 'all 0.2s ease-out';
             modal.style.opacity = '0';
             modal.style.transform = 'scale(0.9) translateY(5px)';
@@ -621,7 +1069,6 @@ class ModernApp {
                 modal.style.display = 'none';
                 modal.style.visibility = 'hidden';
                 
-                // Show open button NAPRAWKA - prosta animacja
                 openBtn.style.display = 'flex';
                 openBtn.style.opacity = '0';
                 openBtn.style.transform = 'scale(0.8)';
@@ -638,7 +1085,6 @@ class ModernApp {
             }, 200);
         };
 
-        // Event listeners NAPRAWKA - lepsze zarządzanie eventami
         openBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -646,7 +1092,6 @@ class ModernApp {
             openModal();
         });
 
-        // NAPRAWKA - lepsze touch events
         let touchStarted = false;
         openBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -675,10 +1120,8 @@ class ModernApp {
             closeModal();
         });
         
-        // NAPRAWKA - lepsze zarządzanie outside click
         document.addEventListener('click', (e) => {
             if (isOpen && !modal.contains(e.target) && !openBtn.contains(e.target)) {
-                // NAPRAWKA - sprawdź czy to nie hamburger menu
                 const hamburger = document.getElementById('hamburger-btn');
                 const mainNav = document.getElementById('main-nav');
                 
@@ -699,7 +1142,6 @@ class ModernApp {
             }
         });
 
-        // Close on link click
         modal.addEventListener('click', (e) => {
             if (e.target.tagName === 'A') {
                 console.log('🔗 Closing CTA modal - link clicked');
@@ -707,7 +1149,6 @@ class ModernApp {
             }
         });
 
-        // Close on escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && isOpen) {
                 console.log('⌨️ Closing CTA modal - escape key');
@@ -715,7 +1156,6 @@ class ModernApp {
             }
         });
 
-        // NAPRAWKA - close on mobile scroll
         let scrollTimeout;
         let lastScrollY = window.scrollY;
         
@@ -724,7 +1164,7 @@ class ModernApp {
                 const currentScrollY = window.scrollY;
                 const scrollDelta = Math.abs(currentScrollY - lastScrollY);
                 
-                if (scrollDelta > 50) { // Tylko przy większym scrollu
+                if (scrollDelta > 50) {
                     clearTimeout(scrollTimeout);
                     scrollTimeout = setTimeout(() => {
                         console.log('📱 Closing CTA modal - significant scroll on mobile');
@@ -739,348 +1179,4 @@ class ModernApp {
         console.log('✅ CTA popup initialized');
     }
 
-    // === SCROLL EFFECTS ===
-    initializeScrollEffects() {
-        if (!('IntersectionObserver' in window)) {
-            console.warn('IntersectionObserver not supported');
-            return;
-        }
-
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const element = entry.target;
-                    element.style.animation = 'fadeIn 0.6s ease-out forwards';
-                    element.classList.add('revealed');
-                    revealObserver.unobserve(element);
-                }
-            });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        });
-
-        const revealElements = document.querySelectorAll('.reveal-element, .feature-item, .pricing-card, .testimonial-card');
-        revealElements.forEach(element => {
-            element.style.opacity = '1';
-            element.style.visibility = 'visible';
-            revealObserver.observe(element);
-        });
-
-        this.observers.set('reveal', revealObserver);
-        console.log('✅ Scroll effects initialized');
-    }
-
-    // === SMOOTH SCROLL - ULEPSZONE DLA MOBILE ===
-    initializeSmoothScroll() {
-        // NAPRAWKA - wyłącz smooth scroll na mobile dla lepszej wydajności
-        if (window.innerWidth <= 768) {
-            console.log('📱 Smooth scroll disabled on mobile for better performance');
-            return;
-        }
-        
-        if (typeof Lenis !== 'undefined') {
-            try {
-                const lenis = new Lenis({
-                    duration: 1.2,
-                    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-                    smooth: true,
-                    // NAPRAWKA - lepsze ustawienia dla desktop
-                    direction: 'vertical',
-                    gestureDirection: 'vertical',
-                    smoothWheel: true,
-                    smoothTouch: false, // Wyłącz na touch dla lepszej wydajności
-                });
-
-                const raf = (time) => {
-                    lenis.raf(time);
-                    requestAnimationFrame(raf);
-                };
-                
-                requestAnimationFrame(raf);
-                
-                // NAPRAWKA - wyłącz przy resize do mobile
-                window.addEventListener('resize', () => {
-                    if (window.innerWidth <= 768) {
-                        lenis.destroy();
-                        console.log('📱 Smooth scroll disabled - mobile detected');
-                    }
-                }, { passive: true });
-                
-                console.log('✅ Smooth scroll initialized (desktop only)');
-            } catch (error) {
-                console.warn('Smooth scroll failed:', error);
-            }
-        }
-    }
-
-    // === MOUSE GRADIENT ===
-    initializeMouseGradient() {
-        const gradient = document.querySelector('.mouse-gradient-background');
-        if (!gradient || window.innerWidth <= 768) return;
-
-        let mouseX = 0;
-        let mouseY = 0;
-        let isMoving = false;
-
-        const updateGradient = () => {
-            gradient.style.transform = `translate(${mouseX - 200}px, ${mouseY - 200}px)`;
-            isMoving = false;
-        };
-
-        const handleMouseMove = (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            if (!isMoving) {
-                requestAnimationFrame(updateGradient);
-                isMoving = true;
-            }
-        };
-
-        document.addEventListener('mousemove', handleMouseMove, { passive: true });
-        console.log('✅ Mouse gradient initialized');
-    }
-
-    // === FLOATING WORDS ===
-    initializeFloatingWords() {
-        const container = document.getElementById('floating-words-container');
-        if (!container || window.innerWidth <= 768) return;
-
-        const words = [
-            'Hello', 'Bonjour', 'Płynność', 'Fluency', 'Grammar', 'Conversation', 
-            'Cześć', 'Apprendre', 'Learn', 'Merci', 'Thanks', 'Język'
-        ];
-        
-        const wordCount = Math.min(15, Math.floor(window.innerWidth / 100));
-        
-        for (let i = 0; i < wordCount; i++) {
-            const word = document.createElement('span');
-            word.className = 'floating-word';
-            word.textContent = words[i % words.length];
-            word.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-            word.style.top = Math.random() * (window.innerHeight - 50) + 'px';
-            word.style.opacity = Math.random() * 0.08 + 0.02;
-            word.style.animationDelay = Math.random() * 8 + 's';
-            
-            container.appendChild(word);
-        }
-        
-        console.log('✅ Floating words initialized');
-    }
-
-    // === MOBILE OPTIMIZATIONS - ULEPSZONE ===
-    initializeMobileOptimizations() {
-        if (window.innerWidth <= 768) {
-            // Disable hover effects on mobile
-            const style = document.createElement('style');
-            style.innerHTML = `
-                @media (hover: none) and (pointer: coarse) {
-                    .feature-item:hover,
-                    .pricing-card:hover,
-                    .testimonial-card:hover,
-                    .offer-category:hover {
-                        transform: none !important;
-                        box-shadow: var(--shadow-subtle) !important;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-
-            // NAPRAWKA - optimize scroll performance na mobile
-            document.addEventListener('touchstart', () => {}, { passive: true });
-            document.addEventListener('touchmove', () => {}, { passive: true });
-            
-            // NAPRAWKA - lepsze zarządzanie scroll na mobile
-            document.body.style.overscrollBehaviorY = 'contain';
-            document.documentElement.style.overscrollBehaviorY = 'contain';
-            
-            // NAPRAWKA - wyłącz animacje przy szybkim scrollu
-            let scrollTimeout;
-            let isScrolling = false;
-            
-            window.addEventListener('scroll', () => {
-                if (!isScrolling) {
-                    // Zmniejsz animacje podczas scrollowania
-                    document.body.classList.add('is-scrolling');
-                    isScrolling = true;
-                }
-                
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    document.body.classList.remove('is-scrolling');
-                    isScrolling = false;
-                }, 150);
-            }, { passive: true });
-            
-            // Dodaj style dla scrollowania
-            const scrollStyle = document.createElement('style');
-            scrollStyle.innerHTML = `
-                @media (max-width: 768px) {
-                    .is-scrolling * {
-                        animation-duration: 0.01ms !important;
-                        transition-duration: 0.1s !important;
-                    }
-                    
-                    .is-scrolling .reveal-element {
-                        animation: none !important;
-                    }
-                }
-            `;
-            document.head.appendChild(scrollStyle);
-            
-            console.log('📱 Enhanced mobile optimizations applied');
-        }
-    }
-
-    // === PERFORMANCE MONITORING ===
-    initializePerformanceMonitoring() {
-        if ('performance' in window) {
-            window.addEventListener('load', () => {
-                setTimeout(() => {
-                    const perfData = performance.getEntriesByType('navigation')[0];
-                    const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
-                    console.log(`⚡ Page load time: ${loadTime}ms`);
-                    
-                    if (loadTime > 3000) {
-                        console.warn('⚠️ Slow page load detected');
-                    }
-                }, 0);
-            });
-        }
-    }
-
-    // === CLEANUP ===
-    destroy() {
-        this.observers.forEach(observer => {
-            observer.disconnect();
-        });
-        this.observers.clear();
-        console.log('✅ App cleaned up');
-    }
-}
-
-const injectAnimations = () => {
-    if (document.getElementById('app-animations')) return;
-
-    const style = document.createElement('style');
-    style.id = 'app-animations';
-    style.textContent = `
-        @keyframes fadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0); 
-            }
-        }
-
-        @keyframes confettiFall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(100vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        .reveal-element {
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
-        .revealed {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-
-        .loading {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .loading::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.3), 
-                transparent
-            );
-            animation: shimmer 1.5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        /* Mobile popup animations */
-        @media (max-width: 768px) {
-            .cta-modal {
-                transform-origin: bottom center !important;
-            }
-            
-            .cta-modal.visible {
-                animation: slideUpMobile 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-            }
-        }
-
-        @keyframes slideUpMobile {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-    `;
-    
-    document.head.appendChild(style);
-};
-
-// === VIEWPORT META TAG INJECTION ===
-const injectViewportMeta = () => {
-    let viewportMeta = document.querySelector('meta[name="viewport"]');
-    
-    if (!viewportMeta) {
-        viewportMeta = document.createElement('meta');
-        viewportMeta.name = 'viewport';
-        document.head.appendChild(viewportMeta);
-    }
-    
-    // NAPRAWIONA BLOKADA ZOOMOWANIA
-    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
-};
-
-// === INITIALIZATION ===
-injectViewportMeta();
-injectAnimations();
-
-// Initialize app
-const app = new ModernApp();
-window.app = app;
-
-// Performance monitoring
-if ('performance' in window) {
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            const perfData = performance.getEntriesByType('navigation')[0];
-            if (perfData) {
-                const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
-                console.log(`⚡ Total load time: ${loadTime}ms`);
-            }
-        }, 0);
-    });
-}
-
-console.log('🎯 App loaded successfully');
+    // ===
