@@ -345,9 +345,9 @@ console.log('📧 Use testEmail() to test configuration');
 console.log('⚙️ Use showEmailConfig() to check settings'); EMAILJS CONFIGURATION ===
         this.emailConfig = {
             publicKey: '9TmBbr71TT08YFetK',              // Twój Public Key
-            serviceId: 'YOUR_SERVICE_ID',                 // ZAMIEŃ NA SWÓJ SERVICE ID
-            notificationTemplate: 'template_notification', // ZAMIEŃ NA ID TEMPLATE DLA CIEBIE
-            thankyouTemplate: 'template_thankyou'         // ZAMIEŃ NA ID TEMPLATE DLA KLIENTA
+            serviceId: 'service_9j8i63n',                 // ZAMIEŃ NA SWÓJ SERVICE ID
+            notificationTemplate: 'template_lybb63a', // ZAMIEŃ NA ID TEMPLATE DLA CIEBIE
+            thankyouTemplate: 'template_q5ninf9'         // ZAMIEŃ NA ID TEMPLATE DLA KLIENTA
         };
         
         this.init();
