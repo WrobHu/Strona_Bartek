@@ -87,8 +87,13 @@ html {
   touch-action: manipulation;
 }
 
-html.lenis {
+/* === SMOOTH SCROLL - ULEPSZONE DLA MOBILE === */
+.lenis.lenis-smooth {
   scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
@@ -1065,7 +1070,7 @@ main {
 
 .testimonials-grid {
   display: grid;
-  /* NAPRAWKA - stała wysokość kolumn na desktop */
+  /* NAPRAWKA - centrowanie grid */
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
@@ -1075,21 +1080,29 @@ main {
   align-items: stretch;
   /* DODATKOWA NAPRAWKA - wyrównanie baseline */
   align-content: start;
+  /* NAPRAWKA - centrowanie gdy mniej niż 3 karty */
+  justify-content: center;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* DESKTOP - wymuś równe wysokości */
+/* DESKTOP - wymuś równe wysokości i centrowanie */
 @media (min-width: 1024px) {
   .testimonials-grid {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 1fr; /* KLUCZOWA NAPRAWKA - równe wysokości wierszy */
+    max-width: 800px; /* Ograniczenie szerokości dla 2 kart */
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
-/* WIĘKSZE DESKTOP - 3 kolumny */
+/* WIĘKSZE DESKTOP - 3 kolumny tylko gdy jest miejsce */
 @media (min-width: 1400px) {
   .testimonials-grid {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 1400px;
+    grid-template-columns: repeat(2, 1fr); /* Zostaw 2 kolumny dla lepszego wyglądu */
+    max-width: 900px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -3205,6 +3218,10 @@ main {
     max-width: 320px;
     margin: 0 auto 2rem;
     order: -1; /* Move image to top on mobile */
+    /* NAPRAWKA - usuń dolną ramkę na mobile */
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 1.5rem;
   }
   
   .about-me-text {
@@ -3229,6 +3246,20 @@ main {
   .offer-category {
     min-height: auto;
   }
+  
+  /* NAPRAWKA - lepsze animacje scroll na mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  html {
+    scroll-behavior: auto !important;
+  }
+  
+  body {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @media (max-width: 480px) {
@@ -3236,10 +3267,17 @@ main {
     /* NAPRAWKA - większe zdjęcie na małym mobile */
     max-width: 280px;
     aspect-ratio: 3/4;
+    /* NAPRAWKA - usuń wszystkie ramki na małym mobile */
+    border: 1px solid var(--color-border);
+    border-bottom: none;
+    margin-bottom: 1rem;
   }
   
   .profile-image {
     object-position: center top; /* Fokus na górnej części na małych ekranach */
+    /* NAPRAWKA - usuń dolną ramkę */
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
   
   .offer-category {
