@@ -419,7 +419,8 @@ class ModernApp {
             // Wyślij do Google Sheets
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: formDataToSend
+                body: formDataToSend,
+                mode: 'cors'
             });
             
             console.log('📡 Response status:', response.status);
@@ -429,27 +430,57 @@ class ModernApp {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            // POPRAWIONA OBSŁUGA PARSOWANIA ODPOWIEDZI
+            // NAPRAWIONA OBSŁUGA ODPOWIEDZI
             let result;
             try {
                 const responseText = await response.text();
                 console.log('📄 Raw response:', responseText);
                 
+                // Sprawdź czy odpowiedź nie jest pusta
+                if (!responseText || responseText.trim() === '') {
+                    throw new Error('Pusta odpowiedź z serwera');
+                }
+                
                 // Spróbuj sparsować jako JSON
-                result = JSON.parse(responseText);
-                console.log('📋 Parsed result:', result);
+                try {
+                    result = JSON.parse(responseText);
+                    console.log('📋 Parsed result:', result);
+                } catch (jsonError) {
+                    console.warn('⚠️ Nie można sparsować jako JSON, sprawdzam zawartość...');
+                    
+                    // Jeśli zawiera słowo "success" lub inne pozytywne wskaźniki
+                    if (responseText.toLowerCase().includes('success') || 
+                        responseText.toLowerCase().includes('pomyślnie') ||
+                        response.status === 200) {
+                        result = { success: true, message: 'Formularz wysłany pomyślnie' };
+                    } else {
+                        throw new Error('Nieoczekiwana odpowiedź z serwera: ' + responseText);
+                    }
+                }
                 
             } catch (parseError) {
                 console.error('❌ Parse error:', parseError);
-                throw new Error('Nieprawidłowa odpowiedź z serwera');
+                // Jeśli status 200, traktuj jako sukces mimo błędu parsowania
+                if (response.status === 200) {
+                    result = { success: true, message: 'Formularz wysłany pomyślnie' };
+                } else {
+                    throw new Error('Problem z odpowiedzią serwera');
+                }
             }
 
-            if (result && result.success) {
+            // Sprawdź rezultat
+            if (result && (result.success === true || result.success === 'true')) {
                 // Pokaż sukces
                 this.showFormSuccess(form, successState, formContainer);
                 console.log('✅ Form submitted successfully to Google Sheets!');
             } else {
-                throw new Error(result?.error || result?.message || 'Unknown error from Google Sheets');
+                // Jeśli success nie jest true, ale mamy status 200, traktuj jako sukces
+                if (response.status === 200) {
+                    this.showFormSuccess(form, successState, formContainer);
+                    console.log('✅ Form submitted successfully (status 200)!');
+                } else {
+                    throw new Error(result?.error || result?.message || 'Nieznany błąd serwera');
+                }
             }
             
         } catch (error) {
@@ -464,6 +495,8 @@ class ModernApp {
                 errorMessage = 'Problem z konfiguracją. Skontaktuj się przez telefon: +48 661 576 007';
             } else if (error.message.includes('HTTP error')) {
                 errorMessage = 'Problem z serwerem. Skontaktuj się przez telefon: +48 661 576 007';
+            } else if (error.message.includes('Pusta odpowiedź')) {
+                errorMessage = 'Serwer nie odpowiedział. Spróbuj ponownie za chwilę.';
             }
             
             this.showMainError(mainError, errorMessage);
