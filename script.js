@@ -398,22 +398,55 @@ class ModernApp {
         this.setSubmitButtonState(submitButton, true, 'Wysyłanie...');
 
         try {
-            // Collect form data
+            // Zbierz dane z formularza
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             data.timestamp = new Date().toISOString();
             
             console.log('📤 Sending form data:', data);
             
-            // Symulacja wysyłania
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // GOOGLE SHEETS URL
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwQNJFxPmZfehKpCXe77hpraJMUCWiEe8MItkhM9K1pyQo45Nh_F4hGHycw1s_C6CQ/exec';
             
-            // Show success animation
-            this.showFormSuccess(form, successState, formContainer);
+            // Wyślij do Google Sheets
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Pokaż sukces
+                this.showFormSuccess(form, successState, formContainer);
+                console.log('✅ Form submitted successfully to Google Sheets!');
+            } else {
+                throw new Error(result.error || 'Unknown error from Google Sheets');
+            }
             
         } catch (error) {
             console.error('❌ Form submission failed:', error);
-            this.showMainError(mainError, 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.');
+            
+            // Pokazuj różne komunikaty w zależności od błędu
+            let errorMessage = 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.';
+            
+            if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
+                errorMessage = 'Sprawdź połączenie internetowe i spróbuj ponownie.';
+            } else if (error.message.includes('CORS')) {
+                errorMessage = 'Problem z konfiguracją. Skontaktuj się przez telefon: +48 661 576 007';
+            } else if (error.message.includes('HTTP error')) {
+                errorMessage = 'Problem z serwerem. Skontaktuj się przez telefon: +48 661 576 007';
+            }
+            
+            this.showMainError(mainError, errorMessage);
         } finally {
             this.setSubmitButtonState(submitButton, false, 'Wyślij wiadomość');
             this.formState.isSubmitting = false;
