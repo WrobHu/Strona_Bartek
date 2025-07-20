@@ -397,63 +397,60 @@ class ModernApp {
         this.hideMainError(mainError);
         this.setSubmitButtonState(submitButton, true, 'Wysyłanie...');
 
-// ZAMIEŃ fragment wysyłania w handleFormSubmit (około linii 405-420)
-
-try {
-    // Zbierz dane z formularza
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    data.timestamp = new Date().toISOString();
-    
-    console.log('📤 Sending form data:', data);
-    
-    // GOOGLE SHEETS URL
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4jOw9P1dWebZQQOxWNVp9ii0CU2kqYTkXdPGcJtkrwGZWpIkU7frQtBIrIfBSpVHT/exec';
-    
-    // SPOSÓB 1: Spróbuj z FormData (Google preferuje to)
-    const formDataToSend = new FormData();
-    Object.keys(data).forEach(key => {
-        formDataToSend.append(key, data[key]);
-    });
-    
-    console.log('📤 Sending as FormData...');
-    
-    // Wyślij do Google Sheets - NOWY SPOSÓB
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        body: formDataToSend  // Wysyłamy FormData, nie JSON
-    });
-    
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-    
-    if (result.success) {
-        // Pokaż sukces
-        this.showFormSuccess(form, successState, formContainer);
-        console.log('✅ Form submitted successfully to Google Sheets!');
-    } else {
-        throw new Error(result.error || 'Unknown error from Google Sheets');
-    }
-    
-} catch (error) {
-    console.error('❌ Form submission failed:', error);
-    
-    // Pokazuj różne komunikaty w zależności od błędu
-    let errorMessage = 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.';
-    
-    if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
-        errorMessage = 'Sprawdź połączenie internetowe i spróbuj ponownie.';
-    } else if (error.message.includes('CORS')) {
-        errorMessage = 'Problem z konfiguracją. Skontaktuj się przez telefon: +48 661 576 007';
-    } else if (error.message.includes('HTTP error')) {
-        errorMessage = 'Problem z serwerem. Skontaktuj się przez telefon: +48 661 576 007';
-    }
-    
-    this.showMainError(mainError, errorMessage);
-}
+        try {
+            // Zbierz dane z formularza
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.timestamp = new Date().toISOString();
+            
+            console.log('📤 Sending form data:', data);
+            
+            // GOOGLE SHEETS URL
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4jOw9P1dWebZQQOxWNVp9ii0CU2kqYTkXdPGcJtkrwGZWpIkU7frQtBIrIfBSpVHT/exec';
+            
+            // SPOSÓB 1: Spróbuj z FormData (Google preferuje to)
+            const formDataToSend = new FormData();
+            Object.keys(data).forEach(key => {
+                formDataToSend.append(key, data[key]);
+            });
+            
+            console.log('📤 Sending as FormData...');
+            
+            // Wyślij do Google Sheets - NOWY SPOSÓB
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: formDataToSend  // Wysyłamy FormData, nie JSON
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Pokaż sukces
+                this.showFormSuccess(form, successState, formContainer);
+                console.log('✅ Form submitted successfully to Google Sheets!');
+            } else {
+                throw new Error(result.error || 'Unknown error from Google Sheets');
+            }
+            
+        } catch (error) {
+            console.error('❌ Form submission failed:', error);
+            
+            // Pokazuj różne komunikaty w zależności od błędu
+            let errorMessage = 'Wystąpił błąd podczas wysyłania. Spróbuj ponownie.';
+            
+            if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
+                errorMessage = 'Sprawdź połączenie internetowe i spróbuj ponownie.';
+            } else if (error.message.includes('CORS')) {
+                errorMessage = 'Problem z konfiguracją. Skontaktuj się przez telefon: +48 661 576 007';
+            } else if (error.message.includes('HTTP error')) {
+                errorMessage = 'Problem z serwerem. Skontaktuj się przez telefon: +48 661 576 007';
+            }
+            
+            this.showMainError(mainError, errorMessage);
         } finally {
             this.setSubmitButtonState(submitButton, false, 'Wyślij wiadomość');
             this.formState.isSubmitting = false;
