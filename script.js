@@ -408,7 +408,7 @@ class ModernApp {
             // GOOGLE SHEETS URL
             const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4jOw9P1dWebZQQOxWNVp9ii0CU2kqYTkXdPGcJtkrwGZWpIkU7frQtBIrIfBSpVHT/exec';
             
-            // SPOSÓB 1: Spróbuj z FormData (Google preferuje to)
+            // Przygotuj FormData do wysłania
             const formDataToSend = new FormData();
             Object.keys(data).forEach(key => {
                 formDataToSend.append(key, data[key]);
@@ -416,24 +416,40 @@ class ModernApp {
             
             console.log('📤 Sending as FormData...');
             
-            // Wyślij do Google Sheets - NOWY SPOSÓB
+            // Wyślij do Google Sheets
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: formDataToSend  // Wysyłamy FormData, nie JSON
+                body: formDataToSend
             });
             
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response OK:', response.ok);
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
-            const result = await response.json();
-            
-            if (result.success) {
+
+            // POPRAWIONA OBSŁUGA PARSOWANIA ODPOWIEDZI
+            let result;
+            try {
+                const responseText = await response.text();
+                console.log('📄 Raw response:', responseText);
+                
+                // Spróbuj sparsować jako JSON
+                result = JSON.parse(responseText);
+                console.log('📋 Parsed result:', result);
+                
+            } catch (parseError) {
+                console.error('❌ Parse error:', parseError);
+                throw new Error('Nieprawidłowa odpowiedź z serwera');
+            }
+
+            if (result && result.success) {
                 // Pokaż sukces
                 this.showFormSuccess(form, successState, formContainer);
                 console.log('✅ Form submitted successfully to Google Sheets!');
             } else {
-                throw new Error(result.error || 'Unknown error from Google Sheets');
+                throw new Error(result?.error || result?.message || 'Unknown error from Google Sheets');
             }
             
         } catch (error) {
