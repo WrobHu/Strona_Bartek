@@ -406,7 +406,7 @@ class ModernApp {
             console.log('📤 Sending form data:', data);
             
             // GOOGLE SHEETS URL
-            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4jOw9P1dWebZQQOxWNVp9ii0CU2kqYTkXdPGcJtkrwGZWpIkU7frQtBIrIfBSpVHT/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZf2tciaI4ixnMdTKydla-bz9p0sWR5aCFw0fsops4Nudt69TEcLb_mUEKxa1D_rYS/exec';
             
             // Przygotuj FormData do wysłania
             const formDataToSend = new FormData();
