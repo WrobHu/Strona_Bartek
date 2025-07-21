@@ -1,4 +1,4 @@
-// === NAPRAWIONA APLIKACJA - BARTŁOMIEJ PŁÓCIENNIK ===
+// === Finalna wersja - BARTŁOMIEJ PŁÓCIENNIK ===
 
 class ModernApp {
     constructor() {
