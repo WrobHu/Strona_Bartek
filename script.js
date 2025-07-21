@@ -406,81 +406,30 @@ class ModernApp {
             console.log('📤 Sending form data:', data);
             
             // GOOGLE SHEETS URL
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZf2tciaI4ixnMdTKydla-bz9p0sWR5aCFw0fsops4Nudt69TEcLb_mUEKxa1D_rYS/exec';
-            
-            // Przygotuj FormData do wysłania
-            const formDataToSend = new FormData();
-            Object.keys(data).forEach(key => {
-                formDataToSend.append(key, data[key]);
-            });
-            
-            console.log('📤 Sending as FormData...');
-            
+            // GOOGLE SHEETS URL
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4jOw9P1dWebZQQOxWNVp9ii0CU2kqYTkXdPGcJtkrwGZWpIkU7frQtBIrIfBSpVHT/exec';
             // Wyślij do Google Sheets
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                body: formDataToSend,
-                mode: 'cors'
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
             });
             
-            console.log('📡 Response status:', response.status);
-            console.log('📡 Response OK:', response.ok);
-
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            // NAPRAWIONA OBSŁUGA ODPOWIEDZI
-            let result;
-            try {
-                const responseText = await response.text();
-                console.log('📄 Raw response:', responseText);
-                
-                // Sprawdź czy odpowiedź nie jest pusta
-                if (!responseText || responseText.trim() === '') {
-                    throw new Error('Pusta odpowiedź z serwera');
-                }
-                
-                // Spróbuj sparsować jako JSON
-                try {
-                    result = JSON.parse(responseText);
-                    console.log('📋 Parsed result:', result);
-                } catch (jsonError) {
-                    console.warn('⚠️ Nie można sparsować jako JSON, sprawdzam zawartość...');
-                    
-                    // Jeśli zawiera słowo "success" lub inne pozytywne wskaźniki
-                    if (responseText.toLowerCase().includes('success') || 
-                        responseText.toLowerCase().includes('pomyślnie') ||
-                        response.status === 200) {
-                        result = { success: true, message: 'Formularz wysłany pomyślnie' };
-                    } else {
-                        throw new Error('Nieoczekiwana odpowiedź z serwera: ' + responseText);
-                    }
-                }
-                
-            } catch (parseError) {
-                console.error('❌ Parse error:', parseError);
-                // Jeśli status 200, traktuj jako sukces mimo błędu parsowania
-                if (response.status === 200) {
-                    result = { success: true, message: 'Formularz wysłany pomyślnie' };
-                } else {
-                    throw new Error('Problem z odpowiedzią serwera');
-                }
-            }
-
-            // Sprawdź rezultat
-            if (result && (result.success === true || result.success === 'true')) {
+            
+            const result = await response.json();
+            
+            if (result.success) {
                 // Pokaż sukces
                 this.showFormSuccess(form, successState, formContainer);
                 console.log('✅ Form submitted successfully to Google Sheets!');
             } else {
-                // Jeśli success nie jest true, ale mamy status 200, traktuj jako sukces
-                if (response.status === 200) {
-                    this.showFormSuccess(form, successState, formContainer);
-                    console.log('✅ Form submitted successfully (status 200)!');
-                } else {
-                    throw new Error(result?.error || result?.message || 'Nieznany błąd serwera');
-                }
+                throw new Error(result.error || 'Unknown error from Google Sheets');
             }
             
         } catch (error) {
@@ -495,8 +444,6 @@ const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZf2tciaI4ix
                 errorMessage = 'Problem z konfiguracją. Skontaktuj się przez telefon: +48 661 576 007';
             } else if (error.message.includes('HTTP error')) {
                 errorMessage = 'Problem z serwerem. Skontaktuj się przez telefon: +48 661 576 007';
-            } else if (error.message.includes('Pusta odpowiedź')) {
-                errorMessage = 'Serwer nie odpowiedział. Spróbuj ponownie za chwilę.';
             }
             
             this.showMainError(mainError, errorMessage);
