@@ -1,4 +1,4 @@
-// === Finalna wersja - BARTŁOMIEJ PŁÓCIENNIK ===
+// === NAPRAWIONA APLIKACJA - BARTŁOMIEJ PŁÓCIENNIK ===
 
 class ModernApp {
     constructor() {
@@ -407,7 +407,7 @@ class ModernApp {
             
             // GOOGLE SHEETS URL
             // GOOGLE SHEETS URL
-            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfTtc1_E3PisPmZeiHvTNE9junGXASIL4n0h7M_4pp-lp_5kcbTka7MDM3qvTGxJc/exec';
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwaCkI-DBCFCNU2BwAUgA0cE9OYlSXj2DyLbmyTOIHWIpPwQOWUNqB_lMUF8PMwE2eV/exec';
             // Wyślij do Google Sheets
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -857,4 +857,4 @@ injectAnimations();
 const app = new ModernApp();
 window.app = app;
 
-console.log('🎯 App loaded successfully');
+console.log('🎯 App loaded successfully')
