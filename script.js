@@ -407,7 +407,7 @@ class ModernApp {
             
             // GOOGLE SHEETS URL
             // GOOGLE SHEETS URL
-            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4jOw9P1dWebZQQOxWNVp9ii0CU2kqYTkXdPGcJtkrwGZWpIkU7frQtBIrIfBSpVHT/exec';
+            const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfTtc1_E3PisPmZeiHvTNE9junGXASIL4n0h7M_4pp-lp_5kcbTka7MDM3qvTGxJc/exec';
             // Wyślij do Google Sheets
             const response = await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
